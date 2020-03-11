@@ -1,0 +1,22 @@
+Package: mstools
+Type: Package
+Title: Tool functions
+Version: 0.00.1
+Date: 2020-03-11
+Authors@R: c(
+             person("Benjamin Leon", "Bodirsky", email = "bodirsky@pik-potsdam.de", role = c("aut","cre"))
+		         )
+Description: Tool functions that can be used by several madrat-dependent or magpie4 output functions
+Depends:
+    magclass(>= 2.40)
+Imports:
+	spam,
+	madrat(>= 1.69),
+	luscale
+URL: https://github.com/pik-piam/magpie4, https://doi.org/10.5281/zenodo.1158582
+BugReports: https://github.com/pik-piam/magpie4/issues
+Encoding: UTF-8
+License: LGPL-3 | file LICENSE
+RoxygenNote: 7.0.2
+Suggests: testthat
+ValidationKey: 30431120
