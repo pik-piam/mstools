@@ -1,12 +1,12 @@
 Package: mstools
 Type: Package
-Title: Tool functions
-Version: 0.00.1
+Title: Tool functions that can be used by several madrat-dependent or magpie4 output functions
+Version: 0.0.2
 Date: 2020-03-11
 Authors@R: c(
              person("Benjamin Leon", "Bodirsky", email = "bodirsky@pik-potsdam.de", role = c("aut","cre"))
 		         )
-Description: Tool functions that can be used by several madrat-dependent or magpie4 output functions
+Description: Tool functions that can be used by several madrat-dependent or magpie4 output functions.
 Depends:
     magclass(>= 2.40)
 Imports:
@@ -19,4 +19,4 @@ Encoding: UTF-8
 License: LGPL-3 | file LICENSE
 RoxygenNote: 7.0.2
 Suggests: testthat
-ValidationKey: 30431120
+ValidationKey: 36664
