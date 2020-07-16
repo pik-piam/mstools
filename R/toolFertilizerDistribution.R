@@ -19,7 +19,7 @@
 #' @importFrom magclass getRegions
 #' @export
 
-toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs, threshold=0.5) {
+toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs, threshold=1) {
   
   for (iteration in 1:iteration_max){
     cat(paste0(" iteration: ",iteration)," ")

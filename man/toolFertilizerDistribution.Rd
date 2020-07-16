@@ -14,7 +14,7 @@ toolFertilizerDistribution(
   SNUpE,
   withdrawals,
   organicinputs,
-  threshold = 0.5
+  threshold = 1
 )
 }
 \arguments{
