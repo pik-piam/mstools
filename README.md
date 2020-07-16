@@ -1,6 +1,6 @@
 # Tool functions that can be used by several madrat-dependent or magpie4 output functions
 
-R package **mstools**, version **0.1.2**
+R package **mstools**, version **0.1.3**
 
 [![Travis build status](https://travis-ci.com/pik-piam/magpie4.svg?branch=master)](https://travis-ci.com/pik-piam/magpie4) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1158582.svg)](https://doi.org/10.5281/zenodo.1158582) 
 
