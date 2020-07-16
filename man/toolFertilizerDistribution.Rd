@@ -13,7 +13,8 @@ toolFertilizerDistribution(
   fertilizer,
   SNUpE,
   withdrawals,
-  organicinputs
+  organicinputs,
+  threshold = 0.5
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ toolFertilizerDistribution(
 \item{withdrawals}{nitrogen withdrawals on cell level}
 
 \item{organicinputs}{non-inroganic fertilizer inputs on cell level}
+
+\item{threshold}{threshold in Tg Nr until when the distribution counts as converged}
 }
 \value{
 magpie object with fertilizer usage on cell level

@@ -11,6 +11,7 @@
 #' @param SNUpE Nitrogen use efficiency or SNUPE on regional level which should be matched best possible
 #' @param withdrawals nitrogen withdrawals on cell level
 #' @param organicinputs non-inroganic fertilizer inputs on cell level
+#' @param threshold threshold in Tg Nr until when the distribution counts as converged
 #' @return magpie object with fertilizer usage on cell level
 #' @author Benjamin Leon Bodirsky
 #' @importFrom madrat toolAggregate
@@ -18,7 +19,7 @@
 #' @importFrom magclass getRegions
 #' @export
 
-toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs) {
+toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs, threshold=0.5) {
   
   for (iteration in 1:iteration_max){
     cat(paste0(" iteration: ",iteration)," ")
@@ -31,7 +32,7 @@ toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, 
     requiredfertilizer_nonnegative_country = toolAggregate(requiredfertilizer_nonnegative,rel=mapping,from=from,to=to,partrel=T)
     surplus_fertilizer=requiredfertilizer_nonnegative_country-fertilizer[getRegions(requiredfertilizer_nonnegative),,]
     cat(paste0("  surplus_fertilizer in 2010:",sum(abs(surplus_fertilizer)),";"))
-    if(sum(abs(surplus_fertilizer),na.rm=T)>1){  # 1 is an arbitrary threshold
+    if(sum(abs(surplus_fertilizer),na.rm=T)>threshold){  # 1 is an arbitrary threshold
       SNUpE = (
         groupAggregate(withdrawals,dim = 1,query = mapping,from=from,to=to)
         /(groupAggregate(organicinputs+requiredfertilizer,dim = 1,query = mapping,from=from,to=to) 
@@ -43,7 +44,7 @@ toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, 
       break
     }
   }
-  if(sum(abs(surplus_fertilizer),na.rm=T)>1){
+  if(sum(abs(surplus_fertilizer),na.rm=T)>threshold){
     print(surplus_fertilizer)
     cat(1,"fertilizer distribution procedure found no equilibrium")
   }
