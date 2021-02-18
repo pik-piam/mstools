@@ -2,7 +2,6 @@
 
 export(toolFertilizerDistribution)
 export(toolHoldConstant)
-importFrom(luscale,groupAggregate)
 importFrom(madrat,toolAggregate)
 importFrom(madrat,vcat)
 importFrom(magclass,add_columns)

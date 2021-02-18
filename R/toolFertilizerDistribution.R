@@ -15,7 +15,6 @@
 #' @return magpie object with fertilizer usage on cell level
 #' @author Benjamin Leon Bodirsky
 #' @importFrom madrat toolAggregate
-#' @importFrom luscale groupAggregate
 #' @importFrom magclass getRegions
 #' @export
 
@@ -34,8 +33,8 @@ toolFertilizerDistribution<-function(iteration_max=20, max_snupe=0.85, mapping, 
     cat(paste0("  surplus_fertilizer in 2010:",sum(abs(surplus_fertilizer)),";"))
     if(sum(abs(surplus_fertilizer),na.rm=T)>threshold){  # 1 is an arbitrary threshold
       SNUpE = (
-        groupAggregate(withdrawals,dim = 1,query = mapping,from=from,to=to)
-        /(groupAggregate(organicinputs+requiredfertilizer,dim = 1,query = mapping,from=from,to=to) 
+        toolAggregate(withdrawals,dim = 1,rel = mapping,from=from,to=to)
+        /(toolAggregate(organicinputs+requiredfertilizer,dim = 1,rel = mapping,from=from,to=to) 
           - surplus_fertilizer
         )
       )
