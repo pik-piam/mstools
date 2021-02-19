@@ -5,7 +5,7 @@
 \title{toolFertilizerDistribution}
 \usage{
 toolFertilizerDistribution(
-  iteration_max = 20,
+  iteration_max = 50,
   max_snupe = 0.85,
   mapping,
   from,
@@ -14,7 +14,7 @@ toolFertilizerDistribution(
   SNUpE,
   withdrawals,
   organicinputs,
-  threshold = 1
+  threshold = 0.5
 )
 }
 \arguments{

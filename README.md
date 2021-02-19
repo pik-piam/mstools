@@ -1,6 +1,6 @@
 # Tool functions that can be used by several madrat-dependent or magpie4 output functions
 
-R package **mstools**, version **0.1.5**
+R package **mstools**, version **0.1.6**
 
 [![CRAN status](https://www.r-pkg.org/badges/version/mstools)](https://cran.r-project.org/package=mstools) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1158582.svg)](https://doi.org/10.5281/zenodo.1158582)   
 
