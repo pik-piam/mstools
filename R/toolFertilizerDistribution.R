@@ -19,13 +19,20 @@
 #' @export
 
 toolFertilizerDistribution<-function(iteration_max=50, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs, threshold=0.5) {
+
+  if(length(setdiff(getYears(fertilizer),getYears(withdrawals_reg)))>0) {stop("years have to be harmonized")}
+  if(length(setdiff(getYears(SNUpE),getYears(organicinputs)))>0) {stop("years have to be harmonized")}
+  if(length(setdiff(getYears(SNUpE),getYears(fertilizer)))>0) {stop("years have to be harmonized")}
   
-  withdrawals_reg = toolAggregate(withdrawals,dim = 1,rel = mapping,from=from,to=to)
+  withdrawals_reg = toolAggregate(withdrawals,dim = 1,rel = mapping,from=from,to=to,partrel = TRUE)
+  SNUpE = SNUpE[getRegions(withdrawals_reg),,]
+  fertilizer_check=fertilizer
+  fertilizer = fertilizer[getRegions(withdrawals_reg),,]
   
   for (iteration in 1:iteration_max){
     cat(paste0(" iteration: ",iteration)," ")
     #cat(paste0(" NUE ",round(NUE["DEU",2010,],2))," ")
-    SNUPE_disagg=toolAggregate(SNUpE,rel=mapping,from=to,to=from,partrel=T)
+    SNUPE_disagg=toolAggregate(SNUpE,rel=mapping,from=to,to=from,partrel=TRUE)
     requiredinputs=withdrawals/SNUPE_disagg
     requiredinputs[is.nan(requiredinputs)]<-0
     excessive_organic = organicinputs - requiredinputs
@@ -47,7 +54,7 @@ toolFertilizerDistribution<-function(iteration_max=50, max_snupe=0.85, mapping, 
     gap = sum(requiredinputs) - sum(useable_organic) - sum(fertilizer)
     message(paste0("  surplus_fertilizer in 2010:",round(gap, 2),";"))
     if (gap > threshold ){
-      useable_organic_reg = toolAggregate(useable_organic,dim = 1,rel = mapping,from=from,to=to) 
+      useable_organic_reg = toolAggregate(useable_organic,dim = 1,rel = mapping,from=from,to=to,partrel = TRUE) 
       SNUpE = (
         withdrawals_reg
         /(useable_organic_reg + fertilizer)
@@ -65,5 +72,6 @@ toolFertilizerDistribution<-function(iteration_max=50, max_snupe=0.85, mapping, 
   
   fert = requiredinputs - useable_organic 
   if(abs(sum(fertilizer)-sum(fert))>threshold*1.01){stop("something went wrong")}
+  if(abs(sum(fertilizer_check)-sum(fert))>threshold*1.05){vcat("Due to incomplete mapping of countries to cells, a lot of information got lost in fertilizer disaggregation")}
   return (fert)
 }
