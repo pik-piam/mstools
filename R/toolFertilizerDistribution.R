@@ -20,7 +20,7 @@
 
 toolFertilizerDistribution<-function(iteration_max=50, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs, threshold=0.5) {
 
-  if(length(setdiff(getYears(fertilizer),getYears(withdrawals_reg)))>0) {stop("years have to be harmonized")}
+  if(length(setdiff(getYears(fertilizer),getYears(withdrawals)))>0) {stop("years have to be harmonized")}
   if(length(setdiff(getYears(SNUpE),getYears(organicinputs)))>0) {stop("years have to be harmonized")}
   if(length(setdiff(getYears(SNUpE),getYears(fertilizer)))>0) {stop("years have to be harmonized")}
   
