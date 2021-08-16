@@ -9,7 +9,7 @@
 #' @export
 
 toolHoldConstant <- function(x, years) {
-  if (is.integer(years)) years <- paste0("y", years)
+  if (is.numeric(years)) years <- paste0("y", years)
   missingyears <- setdiff(years, getYears(x))
   if (length(missingyears) == 0) return(x)
   lastyear <- paste0("y", max(getYears(x, as.integer = TRUE)))
