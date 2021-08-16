@@ -1,6 +1,6 @@
 {
   "title": "mstools: Tool functions that can be used by several madrat-dependent or magpie4 output functions",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "<p>Tool functions that can be used by several madrat-dependent or magpie4 output functions.<\/p>",
   "creators": [
     {
