@@ -2,8 +2,12 @@
 
 export(toolFertilizerDistribution)
 export(toolHoldConstant)
+export(toolIsocode2Country)
+import(madrat)
+import(magclass)
 importFrom(madrat,toolAggregate)
 importFrom(madrat,vcat)
 importFrom(magclass,"getYears<-")
 importFrom(magclass,getRegions)
 importFrom(magclass,getYears)
+importFrom(utils,read.csv2)
