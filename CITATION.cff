@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using the metadata from this file.
+type: software
+title: 'mstools: Tool functions that can be used by several madrat-dependent or magpie4
+  output functions'
+version: 0.4.0
+date-released: '2024-01-15'
+abstract: Tool functions that can be used by several madrat-dependent or magpie4 output
+  functions.
+authors:
+- family-names: Bodirsky
+  given-names: Benjamin Leon
+  email: bodirsky@pik-potsdam.de
+- family-names: Dietrich
+  given-names: Jan Philipp
+  email: dietrich@pik-potsdam.de
+license: LGPL-3.0
+repository-code: https://github.com/pik-piam/magpie4
+doi: 10.5281/zenodo.1158582
+
