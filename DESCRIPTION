@@ -1,15 +1,19 @@
 Package: mstools
 Type: Package
 Title: Tool functions that can be used by several madrat-dependent or magpie4 output functions
-Version: 0.4.0.9001
-Date: 2024-01-15
+Version: 0.5.0
+Date: 2024-04-24
 Authors@R: c(person("Benjamin Leon", "Bodirsky", email = "bodirsky@pik-potsdam.de", role = c("aut","cre")),
-		          person("Jan Philipp", "Dietrich", email = "dietrich@pik-potsdam.de", role = "aut"))
+             person("Kristine", "Karstens", role = "aut"),
+             person("Felicitas", "Beier", role = "aut"),
+		         person("Jan Philipp", "Dietrich", email = "dietrich@pik-potsdam.de", role = "aut"))
 Description: Tool functions that can be used by several madrat-dependent or magpie4 output functions.
 Depends:
     magclass(>= 2.40),
     madrat
 Imports:
+    magpiesets,
+    stringr
 URL: https://github.com/pik-piam/magpie4, https://doi.org/10.5281/zenodo.1158582
 BugReports: https://github.com/pik-piam/magpie4/issues
 Encoding: UTF-8
