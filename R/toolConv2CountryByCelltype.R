@@ -7,6 +7,7 @@
 #' @param cells switch between 59199 ("magpiecell") and 67420 ("lpjcell") cells
 #' @return return selected input data on ISO country level
 #' @author Jan Philipp Dietrich
+#' @export
 
 toolConv2CountryByCelltype <- function(x, cells) {
   getSets(x, fulldim = FALSE)[1] <- "x.y.iso"

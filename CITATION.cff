@@ -3,7 +3,7 @@ message: If you use this software, please cite it using the metadata from this f
 type: software
 title: 'mstools: Tool functions that can be used by several madrat-dependent or magpie4
   output functions'
-version: 0.5.0
+version: 0.5.1
 date-released: '2024-04-24'
 abstract: Tool functions that can be used by several madrat-dependent or magpie4 output
   functions.

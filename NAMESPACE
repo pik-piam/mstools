@@ -2,6 +2,7 @@
 
 export(toolAggregateCell2Country)
 export(toolCell2isoCell)
+export(toolConv2CountryByCelltype)
 export(toolCoord2Isocell)
 export(toolCoord2Isocoord)
 export(toolCountryFillBilateral)

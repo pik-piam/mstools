@@ -1,7 +1,7 @@
 Package: mstools
 Type: Package
 Title: Tool functions that can be used by several madrat-dependent or magpie4 output functions
-Version: 0.5.0
+Version: 0.5.1
 Date: 2024-04-24
 Authors@R: c(person("Benjamin Leon", "Bodirsky", email = "bodirsky@pik-potsdam.de", role = c("aut","cre")),
              person("Kristine", "Karstens", role = "aut"),
