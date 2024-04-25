@@ -1,24 +1,29 @@
-Package: mstools
 Type: Package
-Title: Tool functions that can be used by several madrat-dependent or magpie4 output functions
+Package: mstools
+Title: Tool functions that can be used by several madrat-dependent or
+    magpie4 output functions
 Version: 0.5.1.9001
 Date: 2024-04-25
-Authors@R: c(person("Benjamin Leon", "Bodirsky", email = "bodirsky@pik-potsdam.de", role = c("aut","cre")),
-             person("Kristine", "Karstens", role = "aut"),
-             person("Felicitas", "Beier", role = "aut"),
-		         person("Jan Philipp", "Dietrich", email = "dietrich@pik-potsdam.de", role = "aut"))
-Description: Tool functions that can be used by several madrat-dependent or magpie4 output functions.
+Authors@R: c(
+    person("Benjamin Leon", "Bodirsky", , "bodirsky@pik-potsdam.de", role = c("aut", "cre")),
+    person("Kristine", "Karstens", role = "aut"),
+    person("Felicitas", "Beier", role = "aut"),
+    person("Jan Philipp", "Dietrich", , "dietrich@pik-potsdam.de", role = "aut")
+  )
+Description: Tool functions that can be used by several madrat-dependent
+    or magpie4 output functions.
+License: LGPL-3 | file LICENSE
+URL: https://github.com/pik-piam/magpie4,
+    https://doi.org/10.5281/zenodo.1158582
+BugReports: https://github.com/pik-piam/magpie4/issues
 Depends:
-    magclass(>= 2.40),
-    madrat
+    madrat,
+    magclass (>= 2.40)
 Imports:
     magpiesets,
     stringr
-URL: https://github.com/pik-piam/magpie4, https://doi.org/10.5281/zenodo.1158582
-BugReports: https://github.com/pik-piam/magpie4/issues
-Encoding: UTF-8
-License: LGPL-3 | file LICENSE
-RoxygenNote: 7.3.1
 Suggests: 
-    testthat,
-    covr
+    covr,
+    testthat
+Encoding: UTF-8
+RoxygenNote: 7.3.1
