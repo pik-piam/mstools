@@ -1,12 +1,14 @@
-# Tool functions that can be used by several madrat-dependent or magpie4 output functions
+# Tool functions that can be used by several madrat-dependent or
+    magpie4 output functions
 
-R package **mstools**, version **0.4.0**
+R package **mstools**, version **0.6.0**
 
 [![CRAN status](https://www.r-pkg.org/badges/version/mstools)](https://cran.r-project.org/package=mstools) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1158582.svg)](https://doi.org/10.5281/zenodo.1158582) [![R build status](https://github.com/pik-piam/magpie4/workflows/check/badge.svg)](https://github.com/pik-piam/magpie4/actions) [![codecov](https://codecov.io/gh/pik-piam/magpie4/branch/master/graph/badge.svg)](https://app.codecov.io/gh/pik-piam/magpie4) [![r-universe](https://pik-piam.r-universe.dev/badges/mstools)](https://pik-piam.r-universe.dev/builds)
 
 ## Purpose and Functionality
 
-Tool functions that can be used by several madrat-dependent or magpie4 output functions.
+Tool functions that can be used by several madrat-dependent
+    or magpie4 output functions.
 
 
 ## Installation
@@ -38,17 +40,18 @@ In case of questions / problems please contact Benjamin Leon Bodirsky <bodirsky@
 
 To cite package **mstools** in publications use:
 
-Bodirsky B, Dietrich J (2024). _mstools: Tool functions that can be used by several madrat-dependent or magpie4 output functions_. doi: 10.5281/zenodo.1158582 (URL: https://doi.org/10.5281/zenodo.1158582), R package version 0.4.0, <URL: https://github.com/pik-piam/magpie4>.
+Bodirsky B, Karstens K, Beier F, Dietrich J (2024). _mstools: Tool functions that can be used by several madrat-dependent or magpie4 output functions_. doi:10.5281/zenodo.1158582 <https://doi.org/10.5281/zenodo.1158582>, R package version 0.6.0, <https://github.com/pik-piam/magpie4>.
 
 A BibTeX entry for LaTeX users is
 
  ```latex
 @Manual{,
-  title = {mstools: Tool functions that can be used by several madrat-dependent or magpie4 output functions},
-  author = {Benjamin Leon Bodirsky and Jan Philipp Dietrich},
+  title = {mstools: Tool functions that can be used by several madrat-dependent or
+magpie4 output functions},
+  author = {Benjamin Leon Bodirsky and Kristine Karstens and Felicitas Beier and Jan Philipp Dietrich},
   year = {2024},
-  note = {R package version 0.4.0},
-  doi = {10.5281/zenodo.1158582},
+  note = {R package version 0.6.0},
   url = {https://github.com/pik-piam/magpie4},
+  doi = {10.5281/zenodo.1158582},
 }
 ```

@@ -22,6 +22,8 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Kristine Karstens
+  \item Felicitas Beier
   \item Jan Philipp Dietrich \email{dietrich@pik-potsdam.de}
 }
 
