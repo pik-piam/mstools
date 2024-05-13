@@ -1,10 +1,11 @@
 cff-version: 1.2.0
 message: If you use this software, please cite it using the metadata from this file.
 type: software
-title: 'mstools: Tool functions that can be used by several madrat-dependent or magpie4
-  output functions'
-version: 0.5.1.9001
-date-released: '2024-04-25'
+title: |-
+  mstools: Tool functions that can be used by several madrat-dependent or
+      magpie4 output functions
+version: 0.6.0
+date-released: '2024-05-07'
 abstract: Tool functions that can be used by several madrat-dependent or magpie4 output
   functions.
 authors:
