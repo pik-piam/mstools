@@ -12,7 +12,8 @@
 #' up by one in the call stack, \code{level = -1} will use \code{toolExpectTrue} itself as
 #' function call.
 #' @author Jan Philipp Dietrich
-#' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}}, \code{\link{toolStatusMessage}}
+#' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}},
+#' \code{\link{toolStatusMessage}}, \code{\link{toolWriteMadratLog}}
 #' @examples
 #' toolExpectTrue(is.numeric(1), "data is numeric", level = -1)
 #' getMadratMessage("status")
