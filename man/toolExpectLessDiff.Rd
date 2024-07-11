@@ -4,7 +4,7 @@
 \alias{toolExpectLessDiff}
 \title{toolExpectLessDiff}
 \usage{
-toolExpectLessDiff(x, y, maxdiff, description, level = 0)
+toolExpectLessDiff(x, y, maxdiff, description, level = 0, maxdiff2 = NULL)
 }
 \arguments{
 \item{x}{object 1}
@@ -20,6 +20,9 @@ needs to know to which call it should be linked. by default (\code{level = 0}) t
 function call is being used. Increasing the number by one will let the function go
 up by one in the call stack, \code{level = -1} will use \code{toolExpectTrue} itself as
 function call.}
+
+\item{maxdiff2}{optional additional threshold. If set it will serve as a second, critial threshold
+which will throw a warning (instead of a simple note in case of \code{maxdiff}) if being surpassed.}
 }
 \description{
 tool function for status reporting. It performs a difference check between

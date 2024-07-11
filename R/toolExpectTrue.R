@@ -11,6 +11,8 @@
 #' function call is being used. Increasing the number by one will let the function go
 #' up by one in the call stack, \code{level = -1} will use \code{toolExpectTrue} itself as
 #' function call.
+#' @param falseStatus the type of status that is used when the check fails (typically "note"
+#' for a simple message or "warn" for a warning).
 #' @author Jan Philipp Dietrich
 #' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}},
 #' \code{\link{toolStatusMessage}}, \code{\link{toolWriteMadratLog}}
@@ -18,8 +20,9 @@
 #' toolExpectTrue(is.numeric(1), "data is numeric", level = -1)
 #' getMadratMessage("status")
 #' @export
-toolExpectTrue <- function(check, description, level = 0) {
-  status <- ifelse(isTRUE(check), "ok", "warn")
+toolExpectTrue <- function(check, description, level = 0, falseStatus = "note") {
+  status <- ifelse(isTRUE(check), "ok", falseStatus)
   if (!isTRUE(check)) description <- paste0("Check failed: ", description)
   toolStatusMessage(status, description, level = 1 + level)
+  invisible(isTRUE(check))
 }

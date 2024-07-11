@@ -8,7 +8,8 @@ toolStatusMessage(status, message, level = 0)
 }
 \arguments{
 \item{status}{status indicator of the messages. Currently either "ok" (check
-succesful / quality ok), or "warn" (check unsuccessful / undesired result).}
+succesful / quality ok), "note" (check unsuccessful but still acceptable)
+or "warn" (check unsuccessful / undesired result).}
 
 \item{message}{message to be triggered.}
 
@@ -25,6 +26,7 @@ collected to be finally returned as data report.
 }
 \examples{
 toolStatusMessage("ok", "everything is ok", level = -1)
+toolStatusMessage("note", "this is not optimal but probably acceptable", level = -1)
 toolStatusMessage("warn", "this is not ok", level = -1)
 getMadratMessage("status")
 }

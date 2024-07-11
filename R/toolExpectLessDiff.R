@@ -13,6 +13,8 @@
 #' function call is being used. Increasing the number by one will let the function go
 #' up by one in the call stack, \code{level = -1} will use \code{toolExpectTrue} itself as
 #' function call.
+#' @param maxdiff2 optional additional threshold. If set it will serve as a second, critial threshold
+#' which will throw a warning (instead of a simple note in case of \code{maxdiff}) if being surpassed.
 #' @author Jan Philipp Dietrich
 #' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectTrue}}, \code{\link{toolStatusMessage}}
 #' @examples
@@ -20,9 +22,14 @@
 #' getMadratMessage("status")
 #' @export
 
-toolExpectLessDiff <- function(x, y, maxdiff, description, level = 0) {
+toolExpectLessDiff <- function(x, y, maxdiff, description, level = 0, maxdiff2 = NULL) {
   value <- max(abs(x - y))
-  description <- paste0(description, " (maxdiff = ", format(value, digits = 2),
+  descriptionFull <- paste0(description, " (maxdiff = ", format(value, digits = 2),
                         ", threshold = ", format(maxdiff, digits = 2), ")")
-  toolExpectTrue(value <= maxdiff, description, level = level + 1)
+  passed <- toolExpectTrue(value <= maxdiff, descriptionFull, level = level + 1)
+  if(!is.null(maxdiff2)) {
+    descriptionFull <- paste0(description, " (maxdiff = ", format(value, digits = 2),
+                          ", critical threshold = ", format(maxdiff2, digits = 2), ")")
+    passed <- toolExpectTrue(value <= maxdiff2, descriptionFull, level = level + 1, falseStatus = "warn")
+  }
 }
