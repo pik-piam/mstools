@@ -4,8 +4,8 @@ type: software
 title: |-
   mstools: Tool functions that can be used by several madrat-dependent or
       magpie4 output functions
-version: 0.8.0
-date-released: '2024-07-11'
+version: 0.9.0
+date-released: '2024-10-14'
 abstract: Tool functions that can be used by several madrat-dependent or magpie4 output
   functions.
 authors:

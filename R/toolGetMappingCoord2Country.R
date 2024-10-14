@@ -14,7 +14,7 @@
 #' @export
 
 toolGetMappingCoord2Country <- function(pretty = FALSE, extended = FALSE) {
-  out <- toolGetMapping("mapCoords2Country.rds", where = "mrcommons")
+  out <- toolGetMapping("mapCoords2Country.rds", where = "mstools")
 
   if (!extended) {
     out <- out[1:67420, ]
