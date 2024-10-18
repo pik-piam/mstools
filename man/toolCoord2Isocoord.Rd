@@ -7,7 +7,7 @@
 toolCoord2Isocoord(x)
 }
 \arguments{
-\item{x}{object to be transformed from coordinates to iso-coordinate object}
+\item{x}{magclass object to be transformed from coordinates to iso-coordinate}
 }
 \value{
 magpie object with 67420 cells in x.y.iso naming
@@ -17,5 +17,5 @@ Transforms an object with coordinate spatial data (on half-degree)
              to object with 67420 cells and coordinate and iso country information
 }
 \author{
-Felicitas Beier
+Felicitas Beier, Michael Crawford
 }

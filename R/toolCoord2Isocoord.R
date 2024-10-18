@@ -2,30 +2,55 @@
 #' @description Transforms an object with coordinate spatial data (on half-degree)
 #'              to object with 67420 cells and coordinate and iso country information
 #'
-#' @param x     object to be transformed from coordinates to iso-coordinate object
+#' @param x     magclass object to be transformed from coordinates to iso-coordinate
 #'
 #' @return magpie object with 67420 cells in x.y.iso naming
-#' @author Felicitas Beier
-#'
+#' @author Felicitas Beier, Michael Crawford
 #'
 #' @export
 
 toolCoord2Isocoord <- function(x) {
 
-    # coordinate to country mapping for 67420 cells
-    mapping <- toolGetMappingCoord2Country()
-    mapping$coordiso <- paste(mapping$coords,
-                              mapping$iso,
-                              sep = ".")
+  x <- magclass::clean_magpie(x)
 
-    # sort first dimension as provided by mapping
-    x <- x[mapping$coords, , ]
-    # rename first dimension
-    getItems(x, dim = 1, raw = TRUE) <- mapping$coordiso
-    # set names
-    getSets(x)["d1.1"] <- "x"
-    getSets(x)["d1.2"] <- "y"
-    getSets(x)["d1.3"] <- "iso"
+  mstools::toolExpectTrue(
+    magclass::hasCoords(x),
+    "Coordinate data is expected (called `x` and `y`)",
+    falseStatus = "note"
+  )
+
+  # Remove all spatial dimensions except x and y, ensure they're correctly named
+  x <- magclass::collapseDim(x, keepdim = c(1.1, 1.2, 2, 3))
+  magclass::getSets(x)[c("d1.1", "d1.2")] <- c("x", "y")
+
+  spatialDim <- magclass::getItems(x, dim = 1)
+  mapping <- mstools::toolGetMappingCoord2Country()
+  matches <- match(x = spatialDim, table = mapping$coords)
+
+  # When there are x coordinates that are absent in the mapping, these
+  # will trigger a note and be removed from the resulting object
+  mstools::toolExpectTrue(
+    !(any(is.na(matches))),
+    "Invalid spatial dimensions cannot be mapped to ISO and are removed",
+    falseStatus = "note"
+  )
+
+  # Append iso to coordinates of x
+  x <- magclass::add_dimension(x, dim = 1.3, add = "iso", nm = "dummy")
+  magclass::getItems(x, dim = 1.3) <- mapping$iso[matches]
+  x <- x[which(!is.na(matches)), , ] # cells absent from the mapping will have been set to NA
+
+  mstools::toolExpectTrue(
+    dim(x)[1] == 67420,
+    "magclass object doesn't conform to standard 67420 cell size",
+    falseStatus = "note"
+  )
+
+  # Arrange spatial dimension of x to match the mapping
+  spatialDim <- magclass::getItems(magclass::collapseDim(x, dim = 1.3), dim = 1)
+  indices <- match(mapping$coords, spatialDim)
+  x <- x[indices, , , drop = FALSE]
 
   return(x)
+
 }
