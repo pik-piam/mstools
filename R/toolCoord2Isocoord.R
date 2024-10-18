@@ -20,8 +20,10 @@ toolCoord2Isocoord <- function(x) {
   )
 
   # Remove all spatial dimensions except x and y, ensure they're correctly named
-  x <- magclass::collapseDim(x, keepdim = c(1.1, 1.2, 2, 3))
   magclass::getSets(x)[c("d1.1", "d1.2")] <- c("x", "y")
+  setsToRetain <- c("d1.1", "d1.2")
+  setsToRemove <- setdiff(grep("^d1", names(getSets(x)), value = TRUE), setsToRetain)
+  x <- magclass::collapseDim(x, dim = getSets(x)[setsToRemove])
 
   spatialDim <- magclass::getItems(x, dim = 1)
   mapping <- mstools::toolGetMappingCoord2Country()
