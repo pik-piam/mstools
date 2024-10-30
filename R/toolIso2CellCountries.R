@@ -15,7 +15,7 @@
 
 toolIso2CellCountries <- function(x, cells = "magpiecell", absolute = NULL) {
   if (cells == "magpiecell") {
-    cellToCellIso <- toolGetMapping(name = "CountryToCellMapping.rds", where = "mrcommons")
+    cellToCellIso <- toolGetMapping(name = "CountryToCellMapping.rds", where = "mstools")
     isoCellCountry <- unique(cellToCellIso$iso)
   } else if (cells == "lpjcell") {
     map <- toolGetMappingCoord2Country()

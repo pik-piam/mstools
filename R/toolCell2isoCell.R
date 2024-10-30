@@ -12,7 +12,7 @@
 toolCell2isoCell <- function(x, cells = "magpiecell") {
 
   if (cells == "magpiecell") {
-    cellToCellIso <- toolGetMapping(name = "CountryToCellMapping.rds", where = "mrcommons")
+    cellToCellIso <- toolGetMapping(name = "CountryToCellMapping.rds", where = "mstools")
     getCells(x)   <- cellToCellIso$celliso
   }
 
