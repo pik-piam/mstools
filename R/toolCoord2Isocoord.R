@@ -15,7 +15,7 @@ toolCoord2Isocoord <- function(x) {
 
   mstools::toolExpectTrue(
     magclass::hasCoords(x),
-    "Coordinate data is expected (called `x` and `y`)",
+    "has coordinate data (called `x` and `y`)",
     falseStatus = "note"
   )
 
@@ -33,7 +33,7 @@ toolCoord2Isocoord <- function(x) {
   # will trigger a note and be removed from the resulting object
   mstools::toolExpectTrue(
     !(any(is.na(matches))),
-    "Invalid spatial dimensions cannot be mapped to ISO and are removed",
+    "all spatial dimensions can be mapped to ISO", # invalid dimensions are just removed, so this is only a note
     falseStatus = "note"
   )
 
@@ -44,7 +44,7 @@ toolCoord2Isocoord <- function(x) {
 
   mstools::toolExpectTrue(
     dim(x)[1] == 67420,
-    "magclass object doesn't conform to standard 67420 cell size",
+    "magclass object conforms to standard 67420 cell size",
     falseStatus = "note"
   )
 
