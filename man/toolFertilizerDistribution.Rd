@@ -8,6 +8,9 @@ toolFertilizerDistribution(
   iterMax = 50,
   maxSnupe = 0.85,
   fertilizer,
+  mapping = NULL,
+  from = NULL,
+  to = NULL,
   snupe,
   withdrawals,
   organicinputs,
@@ -20,6 +23,12 @@ toolFertilizerDistribution(
 \item{maxSnupe}{Maximum allowed snupe (used to cap NA's during iteration)}
 
 \item{fertilizer}{Total inorganic fertilizer to distribute (regional level)}
+
+\item{mapping}{mapping used for disaggregation}
+
+\item{from}{name of from column in mapping}
+
+\item{to}{name of to column in mapping}
 
 \item{snupe}{Regional soil nitrogen uptake efficiency}
 
@@ -34,4 +43,7 @@ magpie object of fertilizer usage at cell level
 }
 \description{
 Disaggregates fertilizer usage to best match soil nitrogen uptake efficiency (snupe).
+}
+\author{
+Benjamin Leon Bodirsky, Michael Crawford
 }
