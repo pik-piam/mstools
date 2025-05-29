@@ -1,77 +1,76 @@
 #' @title toolFertilizerDistribution
-#' @description Disaggregates fertilizer usage, trying to best match a certain soil nitrogen uptake efficiency (SNUpE). Also used in magpie4 library
-#' 
+#' @description Disaggregates fertilizer usage to best match soil nitrogen uptake efficiency (snupe).
+#' @param iterMax Maximum number of iterations for downscaling
+#' @param maxSnupe Maximum allowed snupe (used to cap NA's during iteration)
+#' @param fertilizer Total inorganic fertilizer to distribute (regional level)
+#' @param snupe Regional soil nitrogen uptake efficiency
+#' @param withdrawals Nitrogen withdrawals at the cell level
+#' @param organicinputs Non-inorganic fertilizer inputs at the cell level
+#' @param threshold Tg N difference below which we consider convergence "good enough"
+#' @return magpie object of fertilizer usage at cell level
+#' @importFrom magclass getYears getRegions dimSums
 #'
-#' @param iteration_max maximum iteration for downscaling
-#' @param max_snupe the maximum level of nue or snupe
-#' @param mapping mapping used for disaggregation
-#' @param from name of from column in mapping
-#' @param to name of to column in mapping
-#' @param fertilizer total inorganic fertilizer to be distributed on regional leve
-#' @param SNUpE Nitrogen use efficiency or SNUPE on regional level which should be matched best possible
-#' @param withdrawals nitrogen withdrawals on cell level
-#' @param organicinputs non-inroganic fertilizer inputs on cell level
-#' @param threshold threshold in Tg Nr until when the distribution counts as converged
-#' @return magpie object with fertilizer usage on cell level
-#' @author Benjamin Leon Bodirsky
-#' @importFrom madrat toolAggregate
-#' @importFrom magclass getRegions
 #' @export
+toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer,
+                                       snupe, withdrawals, organicinputs, threshold = 0.5) {
 
-toolFertilizerDistribution<-function(iteration_max=50, max_snupe=0.85, mapping, from, to, fertilizer, SNUpE, withdrawals, organicinputs, threshold=0.5) {
+  # - harmonize years
+  yrs <- getYears(fertilizer)
+  sameYears <- function(x) identical(yrs, getYears(x))
+  if (!all(sameYears(withdrawals), sameYears(snupe), sameYears(organicinputs))) {
+    stop("All inputs must share the same years.")
+  }
 
-  if(length(setdiff(getYears(fertilizer),getYears(withdrawals)))>0) {stop("years have to be harmonized")}
-  if(length(setdiff(getYears(SNUpE),getYears(organicinputs)))>0) {stop("years have to be harmonized")}
-  if(length(setdiff(getYears(SNUpE),getYears(fertilizer)))>0) {stop("years have to be harmonized")}
-  
-  withdrawals_reg = toolAggregate(withdrawals,dim = 1,rel = mapping,from=from,to=to,partrel = TRUE)
-  SNUpE = SNUpE[getRegions(withdrawals_reg),,]
-  fertilizer_check=fertilizer
-  fertilizer = fertilizer[getRegions(withdrawals_reg),,]
-  
-  for (iteration in 1:iteration_max){
-    cat(paste0(" iteration: ",iteration)," ")
-    #cat(paste0(" NUE ",round(NUE["DEU",2010,],2))," ")
-    SNUPE_disagg=toolAggregate(SNUpE,rel=mapping,from=to,to=from,partrel=TRUE)
-    requiredinputs=withdrawals/SNUPE_disagg
-    requiredinputs[is.nan(requiredinputs)]<-0
-    excessive_organic = organicinputs - requiredinputs
-    excessive_organic[excessive_organic<0] = 0
-    
-    useable_organic = organicinputs - excessive_organic 
- 
-    '   
-    # negative required fertilizers indicate that organic fertilizers are sufficent to satisfy the needs. 
-    requiredfertilizer_nonnegative_country = toolAggregate(requiredfertilizer_nonnegative,rel=mapping,from=from,to=to,partrel=T)
-    surplus_fertilizer=fertilizer[getRegions(requiredfertilizer_nonnegative),,]-requiredfertilizer_nonnegative_country
-    '
-'    message(paste0("  surplus_fertilizer in 2010:",round(sum(abs(surplus_fertilizer)),2),";"))
-    cat(paste0("fert: ",fertilizer["SSA","y1995",]))
-    cat(paste0("req: ",requiredfertilizer_nonnegative_country["SSA","y1995",]))
-    cat(paste0("sur: ",surplus_fertilizer["SSA","y1995",]))
-    cat(paste0("snupe: ",SNUpE["SSA","y1995",]))
-'
-    gap = sum(requiredinputs) - sum(useable_organic) - sum(fertilizer)
-    message(paste0("  surplus_fertilizer in 2010:",round(gap, 2),";"))
-    if (gap > threshold ){
-      useable_organic_reg = toolAggregate(useable_organic,dim = 1,rel = mapping,from=from,to=to,partrel = TRUE) 
-      SNUpE = (
-        withdrawals_reg
-        /(useable_organic_reg + fertilizer)
-      )
-      SNUpE[is.na(SNUpE)]<-max_snupe
-    } else {
+  # - aggregate to region
+  withdrawalsReg <- dimSums(withdrawals, dim = c(1.1, 1.2))
+  regions <- getItems(withdrawalsReg, dim = 1)
+  snupe <- snupe[regions, , ]
+  fertilizerRegional <- fertilizer[regions, , ]
+  fertilizerInitial <- fertilizerRegional
+
+  gap <- Inf
+  for (i in seq_len(iterMax)) {
+    message(sprintf("Iteration %d/%d", i, iterMax))
+
+    # - compute required inputs per cell
+    required <- withdrawals / snupe
+    required[is.nan(required)] <- 0
+
+    # - split organic into usable vs. excessive
+    excessiveOrganic <- pmax(0, organicinputs - required)
+    usableOrganic <- organicinputs - excessiveOrganic
+
+    # - compute surplus fertilizer gap
+    gap <- sum(required) - sum(usableOrganic) - sum(fertilizerRegional)
+    message(sprintf("  Surplus fertilizer: %.2f Tg N", gap))
+
+    if (gap <= threshold) {
       break
     }
+
+    # - update snupe based on new regional balance
+    usableOrganicRegional <- dimSums(usableOrganic, dim = c(1.1, 1.2))
+    snupe <- withdrawalsReg / (usableOrganicRegional + fertilizerRegional)
+    snupe[is.na(snupe)] <- maxSnupe
   }
-  if(gap > threshold){
-    cat(1,"fertilizer distribution procedure found no equilibrium")
-    cat(1,paste0("remaining gap of ",round(gap,5)))
+
+  if (gap > threshold) {
+    warning(
+      "Fertilizer distribution did not converge; remaining gap: ",
+      round(gap, 5), " Tg N"
+    )
   }
-  #snupe_cell=withdrawals/(organicinputs+requiredfertilizer_nonnegative)
-  
-  fert = requiredinputs - useable_organic 
-  if(abs(sum(fertilizer)-sum(fert))>threshold*1.01){stop("something went wrong")}
-  if(abs(sum(fertilizer_check)-sum(fert))>threshold*1.05){vcat("Due to incomplete mapping of countries to cells, a lot of information got lost in fertilizer disaggregation")}
-  return (fert)
+
+  # - final cell-level fertilizer
+  fert <- required - usableOrganic
+
+  # - sanity checks
+  if (abs(sum(fertilizerRegional) - sum(fert)) > threshold * 1.01) {
+    stop("Internal consistency error: cell sums don't match region total")
+  }
+  if (abs(sum(fertilizerInitial) - sum(fert)) > threshold * 1.05) {
+    message("Note: incomplete country-to-cell mapping caused some info loss")
+  }
+
+  return(fert)
 }
