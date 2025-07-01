@@ -25,6 +25,9 @@
 toolStatusMessage <- function(status, message, level = 0) {
   symbol <- toolSubtypeSelect(status, c(ok = "\u2713", note = "!", warn = "WARNING"))
   message <- paste0("[", symbol, "] ", message)
-  vcat(ifelse(status == "warn", 0,1), message, show_prefix = FALSE)
-  putMadratMessage("status", message, fname = -2 - level, add = TRUE)
+  vcat(ifelse(status == "warn", 0, 1), message, show_prefix = FALSE)
+  putMadratMessage("status",
+                   message, # if also structured then: list("result" = symbol, "type" = "check", "message" = message)
+                   fname = -2 - level,
+                   add = TRUE)
 }

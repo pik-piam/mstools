@@ -16,5 +16,5 @@ toolWriteMadratLog <- function(checkResults = getMadratMessage("status"), logPat
                                    ""),
                                  collapse = "\n")
   }
-  writeLines(consistencyCheckLog, logPath)
+  writeLines(yaml::as.yaml(checkResults), logPath)
 }

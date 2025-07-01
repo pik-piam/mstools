@@ -21,7 +21,8 @@ Depends:
     magclass (>= 2.40)
 Imports:
     magpiesets,
-    stringr
+    stringr,
+    yaml
 Suggests: 
     covr,
     testthat
