@@ -31,7 +31,7 @@ toolStatusMessage("warn", "this is not ok", level = -1)
 getMadratMessage("status")
 }
 \seealso{
-\code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}}, \code{\link{toolStatusMessage}}
+\code{\link[madrat]{getMadratMessage}}, \code{\link{toolExpectLessDiff}}, \code{\link{toolStatusMessage}}
 }
 \author{
 Jan Philipp Dietrich

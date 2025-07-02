@@ -16,7 +16,7 @@
 #' @param maxdiff2 optional additional threshold. If set it will serve as a second, critial threshold
 #' which will throw a warning (instead of a simple note in case of \code{maxdiff}) if being surpassed.
 #' @author Jan Philipp Dietrich
-#' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectTrue}}, \code{\link{toolStatusMessage}}
+#' @seealso \code{\link[madrat]{getMadratMessage}}, \code{\link{toolExpectTrue}}, \code{\link{toolStatusMessage}}
 #' @examples
 #' toolExpectLessDiff(1:3, 2:4, 10, "data is sufficiently close", level = -1)
 #' getMadratMessage("status")

@@ -30,7 +30,7 @@ toolExpectTrue(is.numeric(1), "data is numeric", level = -1)
 getMadratMessage("status")
 }
 \seealso{
-\code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}},
+\code{\link[madrat]{getMadratMessage}}, \code{\link{toolExpectLessDiff}},
 \code{\link{toolStatusMessage}}, \code{\link{toolWriteMadratLog}}
 }
 \author{

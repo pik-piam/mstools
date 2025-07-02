@@ -10,7 +10,7 @@ toolWriteMadratLog(
 )
 }
 \arguments{
-\item{checkResults}{list of check results as returned by \code{\link{getMadratMessage}}}
+\item{checkResults}{list of check results as returned by \code{\link[madrat]{getMadratMessage}}}
 
 \item{logPath}{path to the log file to be written}
 }

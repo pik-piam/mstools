@@ -14,7 +14,7 @@
 #' up by one in the call stack, \code{level = -1} will use \code{toolExpectTrue} itself as
 #' function call.
 #' @author Jan Philipp Dietrich
-#' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}}, \code{\link{toolStatusMessage}}
+#' @seealso \code{\link[madrat]{getMadratMessage}}, \code{\link{toolExpectLessDiff}}, \code{\link{toolStatusMessage}}
 #' @examples
 #' toolStatusMessage("ok", "everything is ok", level = -1)
 #' toolStatusMessage("note", "this is not optimal but probably acceptable", level = -1)

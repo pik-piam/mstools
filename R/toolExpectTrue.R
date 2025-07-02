@@ -14,7 +14,7 @@
 #' @param falseStatus the type of status that is used when the check fails (typically "note"
 #' for a simple message or "warn" for a warning).
 #' @author Jan Philipp Dietrich
-#' @seealso \code{\link{getMadratMessage}}, \code{\link{toolExpectLessDiff}},
+#' @seealso \code{\link[madrat]{getMadratMessage}}, \code{\link{toolExpectLessDiff}},
 #' \code{\link{toolStatusMessage}}, \code{\link{toolWriteMadratLog}}
 #' @examples
 #' toolExpectTrue(is.numeric(1), "data is numeric", level = -1)

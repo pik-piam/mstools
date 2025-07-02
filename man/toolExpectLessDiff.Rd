@@ -34,7 +34,7 @@ toolExpectLessDiff(1:3, 2:4, 10, "data is sufficiently close", level = -1)
 getMadratMessage("status")
 }
 \seealso{
-\code{\link{getMadratMessage}}, \code{\link{toolExpectTrue}}, \code{\link{toolStatusMessage}}
+\code{\link[madrat]{getMadratMessage}}, \code{\link{toolExpectTrue}}, \code{\link{toolStatusMessage}}
 }
 \author{
 Jan Philipp Dietrich
