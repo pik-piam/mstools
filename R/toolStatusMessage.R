@@ -27,7 +27,7 @@ toolStatusMessage <- function(status, message, level = 0) {
   message <- paste0("[", symbol, "] ", message)
   vcat(ifelse(status == "warn", 0, 1), message, show_prefix = FALSE)
   putMadratMessage("status",
-                   message, # if also structured then: list("result" = symbol, "type" = "check", "message" = message)
+                   message,
                    fname = -2 - level,
                    add = TRUE)
 }

@@ -8,13 +8,5 @@
 #' @author Pascal Sauer
 #' @export
 toolWriteMadratLog <- function(checkResults = getMadratMessage("status"), logPath = "status.log") {
-  consistencyCheckLog <- NULL
-  for (i in seq_along(checkResults)) {
-    consistencyCheckLog <- paste(c(consistencyCheckLog,
-                                   names(checkResults)[[i]],
-                                   checkResults[[i]],
-                                   ""),
-                                 collapse = "\n")
-  }
   writeLines(yaml::as.yaml(checkResults), logPath)
 }
