@@ -15,8 +15,8 @@ toolWriteMadratLog(
 \item{logPath}{path to the log file to be written}
 }
 \description{
-Tool function for writing madrat messages to a log file. Useful
-after running madrat calculations which are performing checks via
+Tool function for writing madrat messages to a log file in the YAML format.
+Useful after running madrat calculations which are performing checks via
 \code{\link{toolExpectTrue}} or other toolExpect functions.
 }
 \author{
