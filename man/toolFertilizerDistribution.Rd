@@ -14,7 +14,8 @@ toolFertilizerDistribution(
   snupe,
   withdrawals,
   organicinputs,
-  threshold = 0.5
+  threshold = 0.5,
+  progress = TRUE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ toolFertilizerDistribution(
 \item{organicinputs}{Non-inorganic fertilizer inputs at the cell level}
 
 \item{threshold}{Tg N difference below which we consider convergence "good enough"}
+
+\item{progress}{Logical, should progress messages be printed}
 }
 \value{
 magpie object of fertilizer usage at cell level
