@@ -10,6 +10,7 @@
 #' @param withdrawals Nitrogen withdrawals at the cell level
 #' @param organicinputs Non-inorganic fertilizer inputs at the cell level
 #' @param threshold Tg N difference below which we consider convergence "good enough"
+#' @param progress Logical, should progress messages be printed
 #' @return magpie object of fertilizer usage at cell level
 #' @author Benjamin Leon Bodirsky, Michael Crawford
 #' @importFrom magclass getYears dimSums
@@ -17,7 +18,7 @@
 #' @export
 toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer,
                                        mapping = NULL, from = NULL, to = NULL,
-                                       snupe, withdrawals, organicinputs, threshold = 0.5) {
+                                       snupe, withdrawals, organicinputs, threshold = 0.5, progress = TRUE) {
 
   # - harmonize years
   yrs <- getYears(fertilizer)
@@ -42,7 +43,9 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
 
   gap <- Inf
   for (i in seq_len(iterMax)) {
-    message(sprintf("Iteration %d/%d", i, iterMax))
+    if (progress) {
+      message(sprintf("Iteration %d/%d", i, iterMax))
+    }
 
     if (!is.null(mapping)) {
       snupeDisagg <- toolAggregate(snupe, rel = mapping, from = to, to = from, partrel = TRUE)
@@ -60,7 +63,9 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
 
     # - compute surplus fertilizer gap
     gap <- sum(required) - sum(usableOrganic) - sum(fertilizerRegional)
-    message(sprintf("  Surplus fertilizer: %.2f Tg N", gap))
+    if (progress) {
+      message(sprintf("  Surplus fertilizer: %.2f Tg N", gap))
+    }
 
     if (gap <= threshold) {
       break
@@ -78,10 +83,8 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
   }
 
   if (gap > threshold) {
-    warning(
-      "Fertilizer distribution did not converge; remaining gap: ",
-      round(gap, 5), " Tg N"
-    )
+    warning("Fertilizer distribution did not converge; remaining gap: ",
+            round(gap, 5), " Tg N")
   }
 
   # - final cell-level fertilizer
@@ -92,7 +95,7 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
     stop("Internal consistency error: cell sums don't match region total")
   }
   if (abs(sum(fertilizerInitial) - sum(fert)) > threshold * 1.05) {
-    message("Note: incomplete country-to-cell mapping caused some info loss")
+    warning("Note: incomplete country-to-cell mapping caused some info loss")
   }
 
   return(fert)
