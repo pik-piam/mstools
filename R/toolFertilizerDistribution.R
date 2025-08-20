@@ -58,7 +58,7 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
     required[is.nan(required)] <- 0
 
     # - split organic into usable vs. excessive
-    excessiveOrganic <- pmax(0, organicinputs - required)
+    excessiveOrganic <- pmax(organicinputs - required, 0)
     usableOrganic <- organicinputs - excessiveOrganic
 
     # - compute surplus fertilizer gap
