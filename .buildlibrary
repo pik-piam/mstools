@@ -5,6 +5,6 @@ AcceptedWarnings:
 - 'Warning: namespace ''.*'' is not available and has been replaced'
 AcceptedNotes: ~
 allowLinterWarnings: yes
-enforceVersionUpdate: no
+enforceVersionUpdate: yes
 skipCoverage: no
 AutocreateCITATION: yes
