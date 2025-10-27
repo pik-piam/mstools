@@ -1,6 +1,6 @@
 #' @title toolFertilizerDistribution
 #' @description Disaggregates fertilizer usage to best match soil nitrogen uptake efficiency (snupe).
-#' @param iterMax Maximum number of iterations for downscaling
+#' @param iterMax Maximum number of iterations for downscaling. 10 iterations are done at least.
 #' @param maxSnupe Maximum allowed snupe (used to cap NA's during iteration)
 #' @param mapping mapping used for disaggregation
 #' @param from name of from column in mapping
@@ -32,16 +32,20 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
   # with a mapping file when it's provided. The clusterfile used by magpie4 is particularly relevant
   if (!is.null(mapping)) {
     withdrawalsReg <- toolAggregate(withdrawals, dim = 1, rel = mapping, from = from, to = to, partrel = TRUE)
+    organicinputsReg <- toolAggregate(organicinputs, dim = 1, rel = mapping,
+                                     from = from, to = to, partrel = TRUE)
   } else {
     withdrawalsReg <- dimSums(withdrawals, dim = c(1.1, 1.2))
+    organicinputsReg <- dimSums(organicinputsReg, dim = c(1.1, 1.2))
   }
 
   regions <- getItems(withdrawalsReg, dim = 1)
   snupe <- snupe[regions, , ]
+  snupeInitial <- snupe
   fertilizerRegional <- fertilizer[regions, , ]
   fertilizerInitial <- fertilizerRegional
 
-  gap <- Inf
+  gap_accumulate <- 0
   for (i in seq_len(iterMax)) {
     if (progress) {
       message(sprintf("Iteration %d/%d", i, iterMax))
@@ -53,48 +57,54 @@ toolFertilizerDistribution <- function(iterMax = 50, maxSnupe = 0.85, fertilizer
       snupeDisagg <- snupe
     }
 
-    # - compute required inputs per cell
+    # compute required inputs per cell
     required <- withdrawals / snupeDisagg
-    required[is.nan(required)] <- 0
+    required[is.nan(required)] <- withdrawals
 
-    # - split organic into usable vs. excessive
-    excessiveOrganic <- pmax(organicinputs - required, 0)
-    usableOrganic <- organicinputs - excessiveOrganic
+    # compute requirements that cannot be filled with organic fertilizer
+    inorganic_gap =  pmax(required - organicinputs, 0)
+    inorganic_gap_reg = toolAggregate(inorganic_gap, dim = 1, rel = mapping,
+                  from = from, to = to, partrel = TRUE)
 
-    # - compute surplus fertilizer gap
-    gap <- sum(required) - sum(usableOrganic) - sum(fertilizerRegional)
+    # compute excess fertilizer after closing the gap
+    gap = inorganic_gap_reg - fertilizer
+
     if (progress) {
-      message(sprintf("  Surplus fertilizer: %.2f Tg N", gap))
+      message(sprintf("  Mean global fertilizer divergence per timestep: %.2f Tg N", mean(dimSums(abs(gap),dim = c(1,3)))))
     }
 
-    if (gap <= threshold) {
+    if ((abs(mean(dimSums(-gap,dim = c(1,3)))) <= threshold) & (i > 10)) {
       break
     }
 
+    gap_accumulate = gap_accumulate + gap / 3
     # - update snupe based on new regional balance
-    if (!is.null(mapping)) {
-      usableOrganicRegional <- toolAggregate(usableOrganic, dim = 1, rel = mapping,
-                                             from = from, to = to, partrel = TRUE)
-    } else {
-      usableOrganicRegional <- dimSums(usableOrganic, dim = c(1.1, 1.2))
-    }
-    snupe <- withdrawalsReg / (usableOrganicRegional + fertilizerRegional)
+    snupe <- (withdrawalsReg + gap_accumulate) / (organicinputsReg + fertilizer)
     snupe[is.na(snupe)] <- maxSnupe
+    snupe[snupe > maxSnupe] <- maxSnupe
+    snupe[snupe < 0.05] <- 0.05
+
   }
 
-  if (gap > threshold) {
+  if (mean(dimSums(abs(gap),dim = c(1,3))) > threshold) {
     warning("Fertilizer distribution did not converge; remaining gap: ",
-            round(gap, 5), " Tg N")
+            round(mean(dimSums(abs(gap),dim = c(1,3))), 5), " Tg N")
   }
 
-  # - final cell-level fertilizer
-  fert <- required - usableOrganic
+  # - final cell-level fertilizer. Disaggregate based on the weight of the inorganic fertilizer gap.
+  # to speed up: first write regional values in gridded format to have matching formats, then proceed with calculation
+  inorganic_gap_reg_disagg <- toolAggregate(inorganic_gap_reg, rel = mapping, from = to, to = from, partrel = TRUE)
+  fertilizer_disagg <- toolAggregate(fertilizer, rel = mapping, from = to, to = from, partrel = TRUE)
+
+  fert <- (inorganic_gap/inorganic_gap_reg_disagg)
+  fert[is.nan(fert)] <- 0
+  fert = fert * fertilizer_disagg
 
   # - sanity checks
-  if (abs(sum(fertilizerRegional) - sum(fert)) > threshold * 1.01) {
+  if (abs(mean(dimSums(fertilizerRegional,dim = c(1,3))) - mean(dimSums(fert,dim = c(1,3)))) > threshold * 1.01) {
     stop("Internal consistency error: cell sums don't match region total")
   }
-  if (abs(sum(fertilizerInitial) - sum(fert)) > threshold * 1.05) {
+  if (abs(mean(dimSums(fertilizerRegional,dim = c(1,3))) - mean(dimSums(fert,dim = c(1,3)))) > threshold * 1.05) {
     warning("Note: incomplete country-to-cell mapping caused some info loss")
   }
 

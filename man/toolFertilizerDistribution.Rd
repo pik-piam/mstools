@@ -19,7 +19,7 @@ toolFertilizerDistribution(
 )
 }
 \arguments{
-\item{iterMax}{Maximum number of iterations for downscaling}
+\item{iterMax}{Maximum number of iterations for downscaling. 10 iterations are done at least.}
 
 \item{maxSnupe}{Maximum allowed snupe (used to cap NA's during iteration)}
 
