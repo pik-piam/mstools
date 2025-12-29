@@ -4,7 +4,7 @@
 \alias{toolIso2CellCountries}
 \title{toolIso2CellCountries}
 \usage{
-toolIso2CellCountries(x, cells = "magpiecell", absolute = NULL)
+toolIso2CellCountries(x, cells = "lpjcell", absolute = NULL)
 }
 \arguments{
 \item{x}{magpie object on iso country level}

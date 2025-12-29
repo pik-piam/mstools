@@ -13,7 +13,7 @@
 #' @export
 
 
-toolIso2CellCountries <- function(x, cells = "magpiecell", absolute = NULL) {
+toolIso2CellCountries <- function(x, cells = "lpjcell", absolute = NULL) {
   if (cells == "magpiecell") {
     cellToCellIso <- toolGetMapping(name = "CountryToCellMapping.rds", where = "mstools")
     isoCellCountry <- unique(cellToCellIso$iso)
