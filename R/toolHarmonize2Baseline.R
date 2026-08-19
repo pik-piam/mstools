@@ -84,9 +84,23 @@ toolHarmonize2Baseline <- function(x,
     lambda[is.nan(lambda)] <- 1
     lambda <- lambda[, repRefYear, ]
 
-    full[, afterRef, ] <-
-      base[, repRefYear, ] +
-      (x[, afterRef, ] - x[, repRefYear, ]) * (base[, repRefYear, ] / x[, repRefYear, ])**lambda
+    # Where lambda == 1, (base/xr)**lambda == base/xr algebraically, so the
+    # formula below reduces to base*xa/xr. Written as base + (xa-xr)*(base/xr)
+    # it instead subtracts two nearly-equal floating-point quantities whenever
+    # xa is small relative to xr (in particular xa == 0, which is exact in
+    # real arithmetic but leaves dust of implementation-dependent sign in
+    # floating point) -- and that sign decides whether the `full < 0` clamp
+    # below zeroes it or not. Using the cancellation-free form there makes the
+    # zero/nonzero outcome deterministic regardless of summation order (BLAS,
+    # R version, or an upstream vectorization). Guarded to xr > 0 because the
+    # xr == 0 case (only reachable together with lambda == 1 via the
+    # is.nan()<-1 branch above) is NaN in both forms and handled by the
+    # is.na() cleanup below.
+    xRef <- x[, repRefYear, ]
+    cancelSafe <- (lambda == 1) & (xRef > 0)
+    asWritten <- base[, repRefYear, ] + (x[, afterRef, ] - xRef) * (base[, repRefYear, ] / xRef)**lambda
+    rewritten <- base[, repRefYear, ] * x[, afterRef, ] / xRef
+    full[, afterRef, ] <- ifelse(cancelSafe, rewritten, asWritten)
 
     full[, afterRef, ][is.na(full[, afterRef, ])] <- 0
   } else {
