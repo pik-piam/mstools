@@ -84,21 +84,15 @@ toolHarmonize2Baseline <- function(x,
     lambda[is.nan(lambda)] <- 1
     lambda <- lambda[, repRefYear, ]
 
-    # Where lambda == 1, (base/xr)**lambda == base/xr algebraically, so the
-    # formula below reduces to base*xa/xr. Written as base + (xa-xr)*(base/xr)
-    # it instead subtracts two nearly-equal floating-point quantities whenever
-    # xa is small relative to xr (in particular xa == 0, which is exact in
-    # real arithmetic but leaves dust of implementation-dependent sign in
-    # floating point) -- and that sign decides whether the `full < 0` clamp
-    # below zeroes it or not. Using the cancellation-free form there makes the
-    # zero/nonzero outcome deterministic regardless of summation order (BLAS,
-    # R version, or an upstream vectorization). Guarded to xr > 0 because the
-    # xr == 0 case (only reachable together with lambda == 1 via the
-    # is.nan()<-1 branch above) is NaN in both forms and handled by the
-    # is.na() cleanup below. Filled in as a full-array pass first (cheap: one
-    # multiply and one divide), then only the cells where it doesn't apply
-    # are overwritten with the direct formula, so the **lambda power op is
-    # paid for just that subset rather than the whole array.
+    # Where lambda == 1, base + (xa-xr)*(base/xr)^lambda subtracts two nearly-
+    # equal floating-point quantities (worst when xa == 0), leaving dust whose
+    # sign is implementation-dependent and decides whether the `full < 0`
+    # clamp below zeroes it. base*xa/xr is algebraically identical there but
+    # cancellation-free, so the zero/nonzero outcome no longer depends on
+    # summation order. Guarded to xr > 0 (xr == 0 is NaN in both forms and
+    # handled by the is.na() cleanup below). Filled in everywhere first since
+    # it's cheap, then only the cells where it doesn't apply are overwritten
+    # with the direct formula, so **lambda is paid for on just that subset.
     xRef <- x[, repRefYear, ]
     baseRef <- base[, repRefYear, ]
     xAfter <- x[, afterRef, ]
