@@ -11,51 +11,36 @@ test_that("toolHarmonize2Baseline basic input checks still hold", {
 })
 
 test_that("limited method matches a hand-computed value away from cancellation", {
-  # single cell/band/year triple with base[ref] = 10 and x[ref] = 4, so
-  # base > x and lambda equals the square root of x[ref]/base[ref].
+  # base > x at ref, so lambda = sqrt(x[ref]/base[ref]) != 1
   base <- mkSeries(1, 2015, 1, 10)
   x    <- mkSeries(1, c(2015, 2016), 1, c(4, 6))
-  lambda <- sqrt(4 / 10)
-  expected <- 10 + (6 - 4) * (10 / 4)^lambda
+  expected <- 10 + (6 - 4) * (10 / 4)^sqrt(4 / 10)
   out <- toolHarmonize2Baseline(x, base, ref_year = "y2015")
   expect_equal(as.numeric(out[, "y2016", ]), expected, tolerance = 1e-12)
 })
 
-test_that("limited method is bit-identical to the pre-rewrite formula when lambda != 1", {
-  # base > x at ref everywhere -> lambda = sqrt(x/base) != 1 (never hits the
-  # cancellation-free rewrite path), so output must match the direct formula
-  # `base + (xa - xr) * (base/xr)^lambda` exactly.
+test_that("limited method matches the direct formula bit-for-bit when lambda != 1", {
+  # base > x at ref everywhere -> never hits the cancellation-free rewrite
   set.seed(9)
-  ncell <- 200
-  nb <- 2
-  base <- mkSeries(ncell, 1995:2015, nb, runif(ncell * 21 * nb, 2000, 5000))
-  x    <- mkSeries(ncell, 2000:2100, nb, runif(ncell * 101 * nb, 1, 100))
-
-  out <- toolHarmonize2Baseline(x, base, ref_year = "y2015")
+  base <- mkSeries(20, 1995:2015, 2, runif(20 * 21 * 2, 2000, 5000))
+  x    <- mkSeries(20, 2000:2100, 2, runif(20 * 101 * 2, 1, 100))
+  out  <- toolHarmonize2Baseline(x, base, ref_year = "y2015")
 
   xa <- as.array(x)
   ba <- as.array(base)
-  expect_true(all(ba[, "y2015", ] > xa[, "y2015", ])) # sanity: never triggers lambda == 1
+  expect_true(all(ba[, "y2015", ] > xa[, "y2015", ]))
   afterRef <- paste0("y", 2016:2100)
-  # broadcast base/x/lambda at the reference year across afterRef the same
-  # way the source does (index by a repeated reference-year vector), so the
-  # (cell, year, band) layout matches out[, afterRef, ] without any manual
-  # reshaping or risk of recycling misaligned with that layout
   repYr <- rep("y2015", length(afterRef))
-  lambda <- sqrt(xa[, "y2015", , drop = FALSE] / ba[, "y2015", , drop = FALSE])[, repYr, ]
+  lambda <- sqrt(xa[, repYr, ] / ba[, repYr, ])
   expected <- ba[, repYr, ] + (xa[, afterRef, ] - xa[, repYr, ]) * (ba[, repYr, ] / xa[, repYr, ])^lambda
 
   expect_equal(as.numeric(as.array(out[, afterRef, ])), as.numeric(expected))
 })
 
 test_that("the cancellation-free rewrite removes zero/nonzero nondeterminism under a 1-ULP input change", {
-  # This is the regression test for the fix: in the lambda == 1 branch
-  # (base <= x at ref), a value that decays to exactly 0 after the reference
-  # year used to be computed as base - xr*(base/xr), a near-cancellation whose
-  # sign (and therefore whether it survives the `full < 0 -> 0` clamp) depends
-  # on the last bit of xr. A 1-ULP perturbation of the input -- standing in
-  # for any change in summation order upstream, such as a vectorized
-  # reformulation of a spline -- must no longer flip the zero/nonzero outcome.
+  # Regression test: a series decaying to exactly 0 after ref used to hit a
+  # near-cancellation whose sign (and clamp-to-zero outcome) depended on the
+  # last bit of x. A 1-ULP input perturbation must no longer flip that outcome.
   set.seed(2)
   ncell <- 2000
   nb <- 2
