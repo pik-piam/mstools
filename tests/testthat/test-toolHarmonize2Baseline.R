@@ -35,17 +35,15 @@ test_that("limited method is bit-identical to the pre-rewrite formula when lambd
 
   xa <- as.array(x)
   ba <- as.array(base)
-  xRef <- xa[, "y2015", ]
-  baRef <- ba[, "y2015", ]
-  expect_true(all(baRef > xRef)) # sanity: this test setup never triggers lambda == 1
-  lambda <- sqrt(xRef / baRef)
+  expect_true(all(ba[, "y2015", ] > xa[, "y2015", ])) # sanity: never triggers lambda == 1
   afterRef <- paste0("y", 2016:2100)
-  # stack per-year (cell x band) slices along the year dimension (middle),
-  # matching out[, afterRef, ]'s (cell, year, band) layout
-  expected <- array(vapply(afterRef, function(yr) {
-    baRef + (xa[, yr, ] - xRef) * (baRef / xRef)^lambda
-  }, matrix(0, ncell, nb)), dim = c(ncell, nb, length(afterRef)))
-  expected <- aperm(expected, c(1, 3, 2))
+  # broadcast base/x/lambda at the reference year across afterRef the same
+  # way the source does (index by a repeated reference-year vector), so the
+  # (cell, year, band) layout matches out[, afterRef, ] without any manual
+  # reshaping or risk of recycling misaligned with that layout
+  repYr <- rep("y2015", length(afterRef))
+  lambda <- sqrt(xa[, "y2015", , drop = FALSE] / ba[, "y2015", , drop = FALSE])[, repYr, ]
+  expected <- ba[, repYr, ] + (xa[, afterRef, ] - xa[, repYr, ]) * (ba[, repYr, ] / xa[, repYr, ])^lambda
 
   expect_equal(as.numeric(as.array(out[, afterRef, ])), as.numeric(expected))
 })

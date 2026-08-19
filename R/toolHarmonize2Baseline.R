@@ -95,12 +95,19 @@ toolHarmonize2Baseline <- function(x,
     # R version, or an upstream vectorization). Guarded to xr > 0 because the
     # xr == 0 case (only reachable together with lambda == 1 via the
     # is.nan()<-1 branch above) is NaN in both forms and handled by the
-    # is.na() cleanup below.
+    # is.na() cleanup below. Filled in as a full-array pass first (cheap: one
+    # multiply and one divide), then only the cells where it doesn't apply
+    # are overwritten with the direct formula, so the **lambda power op is
+    # paid for just that subset rather than the whole array.
     xRef <- x[, repRefYear, ]
+    baseRef <- base[, repRefYear, ]
+    xAfter <- x[, afterRef, ]
     cancelSafe <- (lambda == 1) & (xRef > 0)
-    asWritten <- base[, repRefYear, ] + (x[, afterRef, ] - xRef) * (base[, repRefYear, ] / xRef)**lambda
-    rewritten <- base[, repRefYear, ] * x[, afterRef, ] / xRef
-    full[, afterRef, ] <- ifelse(cancelSafe, rewritten, asWritten)
+
+    full[, afterRef, ] <- baseRef * xAfter / xRef
+    notSafe <- !cancelSafe
+    full[, afterRef, ][notSafe] <-
+      baseRef[notSafe] + (xAfter[notSafe] - xRef[notSafe]) * (baseRef[notSafe] / xRef[notSafe])**lambda[notSafe]
 
     full[, afterRef, ][is.na(full[, afterRef, ])] <- 0
   } else {
