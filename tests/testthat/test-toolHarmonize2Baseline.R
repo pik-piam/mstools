@@ -62,6 +62,19 @@ test_that("the cancellation-free rewrite removes zero/nonzero nondeterminism und
   expect_identical(sum((r1 == 0) != (r2 == 0)), 0L)
 })
 
+test_that("limited method zeroes the post-reference series when x[ref] == 0, regardless of base[ref]", {
+  # x[ref] == 0 used to be resolved inconsistently: base[ref] == 0 gave NaN,
+  # zeroed by the is.na() cleanup, but any base[ref] > 0 -- even dust-sized --
+  # degenerated to base[ref] + x[after] via Inf^0 == 1, passing the raw signal
+  # through unbounded. All must now resolve the same explicit way.
+  x <- mkSeries(1, c(2015, 2016, 2017), 1, c(0, 5, 10))
+  for (baseRef in c(0, 2^-59, 1e-3)) {
+    base <- mkSeries(1, 2015, 1, baseRef)
+    out <- toolHarmonize2Baseline(x, base, ref_year = "y2015")
+    expect_equal(as.numeric(out[, c("y2016", "y2017"), ]), c(0, 0))
+  }
+})
+
 test_that("additive, multiplicative and hard_cut methods are unaffected", {
   set.seed(3)
   ncell <- 50

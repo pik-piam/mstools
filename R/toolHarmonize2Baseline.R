@@ -84,27 +84,36 @@ toolHarmonize2Baseline <- function(x,
     lambda[is.nan(lambda)] <- 1
     lambda <- lambda[, repRefYear, ]
 
-    # Where lambda == 1, base + (xa-xr)*(base/xr)^lambda subtracts two nearly-
-    # equal floating-point quantities (worst when xa == 0), leaving minimal float
-    # values whose sign is implementation-dependent and decides whether the `full < 0`
-    # clamp below zeroes it. base*xa/xr is algebraically identical there but
-    # cancellation-free, so the zero/nonzero outcome no longer depends on
-    # summation order. Guarded to xr > 0 (xr == 0 is NaN in both forms and
-    # handled by the is.na() cleanup below).
     xRef <- x[, repRefYear, ]
     baseRef <- base[, repRefYear, ]
     xAfter <- x[, afterRef, ]
 
-    # We first fill everything with the numerically stable
-    # case as it is cheap and later replace for all unsafe
-    # cells with the full, and more expensive calculation.
+    # Where lambda == 1, base + (xa-xr)*(base/xr)^lambda subtracts two nearly-
+    # equal floating-point quantities (worst when xa == 0), leaving dust whose
+    # sign is implementation-dependent and decides whether the `full < 0` clamp
+    # below zeroes it. base*xa/xr is algebraically identical there but
+    # cancellation-free, so the zero/nonzero outcome no longer depends on
+    # summation order. Filled in everywhere first since it's cheap, then only
+    # the cells it doesn't apply to are overwritten below.
     full[, afterRef, ] <- baseRef * xAfter / xRef
-    # This is the full case for all cells for which the
-    # stable path is not correct
     cancelSafeCells <- (lambda == 1) & (xRef > 0)
-    unsafeCells <- !cancelSafeCells
+
+    # xRef == 0 is a second, separate discontinuity: lambda is 0 there (not 1),
+    # so the direct formula degenerates to base + xAfter * Inf^0 = base + xAfter
+    # -- a finite passthrough of the raw signal, not NaN, so it doesn't hit the
+    # is.na() cleanup below. A dust-sized difference in base[ref] (e.g. 2^-59
+    # vs. exact 0) then decides whether this branch fires at all, amplifying it
+    # without bound (confirmed up to 4.17 units in production carbon/yields/
+    # growing-period data, see ../spline-validation-findings.md in the
+    # preprocessing-optimization project). Resolved explicitly instead: with no
+    # reference-year signal to scale by, the post-reference series is zero,
+    # matching the existing base[ref] == 0 behaviour rather than falling out of
+    # whichever of Inf^0 or 0/0 happens to fire.
+    xRefZeroCells <- (xRef == 0)
+    unsafeCells <- !cancelSafeCells & !xRefZeroCells
     full[, afterRef, ][unsafeCells] <- baseRef[unsafeCells] +
       (xAfter[unsafeCells] - xRef[unsafeCells]) * (baseRef[unsafeCells] / xRef[unsafeCells])**lambda[unsafeCells]
+    full[, afterRef, ][xRefZeroCells] <- 0
 
     full[, afterRef, ][is.na(full[, afterRef, ])] <- 0
   } else {
