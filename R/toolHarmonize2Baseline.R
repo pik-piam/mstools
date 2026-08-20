@@ -16,10 +16,10 @@
 #' @export
 
 toolHarmonize2Baseline <- function(x,
-                                   base,
-                                   ref_year = "y2015", # nolint: object_name_linter
-                                   method = "limited",
-                                   hard_cut = FALSE # nolint: object_name_linter
+  base,
+  ref_year = "y2015", # nolint: object_name_linter
+  method = "limited",
+  hard_cut = FALSE # nolint: object_name_linter
 ) {
   if (!is.magpie(x) || !is.magpie(base)) stop("Input is not a MAgPIE object, x has to be a MAgPIE object!")
 
@@ -85,23 +85,26 @@ toolHarmonize2Baseline <- function(x,
     lambda <- lambda[, repRefYear, ]
 
     # Where lambda == 1, base + (xa-xr)*(base/xr)^lambda subtracts two nearly-
-    # equal floating-point quantities (worst when xa == 0), leaving dust whose
-    # sign is implementation-dependent and decides whether the `full < 0`
+    # equal floating-point quantities (worst when xa == 0), leaving minimal float
+    # values whose sign is implementation-dependent and decides whether the `full < 0`
     # clamp below zeroes it. base*xa/xr is algebraically identical there but
     # cancellation-free, so the zero/nonzero outcome no longer depends on
     # summation order. Guarded to xr > 0 (xr == 0 is NaN in both forms and
-    # handled by the is.na() cleanup below). Filled in everywhere first since
-    # it's cheap, then only the cells where it doesn't apply are overwritten
-    # with the direct formula, so **lambda is paid for on just that subset.
+    # handled by the is.na() cleanup below).
     xRef <- x[, repRefYear, ]
     baseRef <- base[, repRefYear, ]
     xAfter <- x[, afterRef, ]
-    cancelSafe <- (lambda == 1) & (xRef > 0)
 
+    # We first fill everything with the numerically stable
+    # case as it is cheap and later replace for all unsafe
+    # cells with the full, and more expensive calculation.
     full[, afterRef, ] <- baseRef * xAfter / xRef
-    notSafe <- !cancelSafe
-    full[, afterRef, ][notSafe] <-
-      baseRef[notSafe] + (xAfter[notSafe] - xRef[notSafe]) * (baseRef[notSafe] / xRef[notSafe])**lambda[notSafe]
+    # This is the full case for all cells for which the
+    # stable path is not correct
+    cancelSafeCells <- (lambda == 1) & (xRef > 0)
+    unsafeCells <- !cancelSafeCells
+    full[, afterRef, ][unsafeCells] <- baseRef[unsafeCells] +
+      (xAfter[unsafeCells] - xRef[unsafeCells]) * (baseRef[unsafeCells] / xRef[unsafeCells])**lambda[unsafeCells]
 
     full[, afterRef, ][is.na(full[, afterRef, ])] <- 0
   } else {
