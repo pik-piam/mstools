@@ -99,21 +99,24 @@ toolHarmonize2Baseline <- function(x,
     cancelSafeCells <- (lambda == 1) & (xRef > 0)
 
     # xRef == 0 is a second, separate discontinuity: lambda is 0 there (not 1),
-    # so the direct formula degenerates to base + xAfter * Inf^0 = base + xAfter
-    # -- a finite passthrough of the raw signal, not NaN, so it doesn't hit the
-    # is.na() cleanup below. A dust-sized difference in base[ref] (e.g. 2^-59
-    # vs. exact 0) then decides whether this branch fires at all, amplifying it
-    # without bound (confirmed up to 4.17 units in production carbon/yields/
-    # growing-period data, see ../spline-validation-findings.md in the
-    # preprocessing-optimization project). Resolved explicitly instead: with no
-    # reference-year signal to scale by, the post-reference series is zero,
-    # matching the existing base[ref] == 0 behaviour rather than falling out of
-    # whichever of Inf^0 or 0/0 happens to fire.
+    # so the direct formula degenerates to base + xAfter * Inf^0 = base + xAfter.
+    # That is not an accident of R's Inf^0 == 1 convention -- it is the formula's
+    # own continuous limit as xRef -> 0+ (verified numerically: the limit value is
+    # approached smoothly from xRef = 1e-2 down through 1e-300). The one point that
+    # is genuinely broken is baseRef == 0 & xRef == 0, where the formula gives NaN
+    # (caught by the is.na() cleanup below) instead of the limit xAfter that every
+    # baseRef -> 0+ sequence converges to. An earlier version of this fix zeroed
+    # xRef == 0 unconditionally instead, which "fixed" that one point by discarding
+    # the well-behaved baseRef > 0 limb -- confirmed on the full production archive
+    # to *increase* genuine (non-dust) differences by orders of magnitude (e.g.
+    # carbon_stocks: 93 -> 395,046 cells), because it introduced a new
+    # discontinuity in xRef instead of removing the one in baseRef. See
+    # ../spline-validation-findings.md in the preprocessing-optimization project.
     xRefZeroCells <- (xRef == 0)
     unsafeCells <- !cancelSafeCells & !xRefZeroCells
     full[, afterRef, ][unsafeCells] <- baseRef[unsafeCells] +
       (xAfter[unsafeCells] - xRef[unsafeCells]) * (baseRef[unsafeCells] / xRef[unsafeCells])**lambda[unsafeCells]
-    full[, afterRef, ][xRefZeroCells] <- 0
+    full[, afterRef, ][xRefZeroCells] <- baseRef[xRefZeroCells] + xAfter[xRefZeroCells]
 
     full[, afterRef, ][is.na(full[, afterRef, ])] <- 0
   } else {
