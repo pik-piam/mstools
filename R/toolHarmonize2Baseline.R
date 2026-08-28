@@ -24,7 +24,7 @@ toolHarmonize2Baseline <- function(x,
   if (!is.magpie(x) || !is.magpie(base)) stop("Input is not a MAgPIE object, x has to be a MAgPIE object!")
 
   # check for negative range of values
-  negative <- (any(x < 0) | any(base < 0))
+  negative <- (any(x < 0, na.rm = TRUE) | any(base < 0, na.rm = TRUE))
 
   # check if years are overlapping and refs is part of both time horizons
   if (!ref_year %in% intersect(getYears(x), getYears(base))) {
@@ -88,37 +88,35 @@ toolHarmonize2Baseline <- function(x,
     baseRef <- base[, repRefYear, ]
     xAfter <- x[, afterRef, ]
 
-    # Where lambda == 1, base + (xa-xr)*(base/xr)^lambda subtracts two nearly-
-    # equal floating-point quantities (worst when xa == 0), leaving dust whose
-    # sign is implementation-dependent and decides whether the `full < 0` clamp
-    # below zeroes it. base*xa/xr is algebraically identical there but
-    # cancellation-free, so the zero/nonzero outcome no longer depends on
-    # summation order. Filled in everywhere first since it's cheap, then only
+    # The basic formula in the following is
+    #   base + (xa-xr)*(base/xr)^lambda
+    #
+    # For lambda == 1, we first use the algebraically identical form base*xa/xr,
+    # as it is numerically more stable and does not result in floating point residualy.
+    # We first, fill it in everywhere since it's cheap, then only
     # the cells it doesn't apply to are overwritten below.
     full[, afterRef, ] <- baseRef * xAfter / xRef
-    cancelSafeCells <- (lambda == 1) & (xRef > 0)
 
-    # xRef == 0 is a second, separate discontinuity: lambda is 0 there (not 1),
-    # so the direct formula degenerates to base + xAfter * Inf^0 = base + xAfter.
-    # That is not an accident of R's Inf^0 == 1 convention -- it is the formula's
-    # own continuous limit as xRef -> 0+ (verified numerically: the limit value is
-    # approached smoothly from xRef = 1e-2 down through 1e-300). The one point that
-    # is genuinely broken is baseRef == 0 & xRef == 0, where the formula gives NaN
-    # (caught by the is.na() cleanup below) instead of the limit xAfter that every
-    # baseRef -> 0+ sequence converges to. An earlier version of this fix zeroed
-    # xRef == 0 unconditionally instead, which "fixed" that one point by discarding
-    # the well-behaved baseRef > 0 limb -- confirmed on the full production archive
-    # to *increase* genuine (non-dust) differences by orders of magnitude (e.g.
-    # carbon_stocks: 93 -> 395,046 cells), because it introduced a new
-    # discontinuity in xRef instead of removing the one in baseRef. See
-    # ../spline-validation-findings.md in the preprocessing-optimization project.
-    xRefZeroCells <- (xRef == 0)
-    unsafeCells <- !cancelSafeCells & !xRefZeroCells
-    full[, afterRef, ][unsafeCells] <- baseRef[unsafeCells] +
-      (xAfter[unsafeCells] - xRef[unsafeCells]) * (baseRef[unsafeCells] / xRef[unsafeCells])**lambda[unsafeCells]
+    # We then continue to calculate the full formula for all other cells
+    fullCalc <- lambda != 1 & xRef != 0
+    full[, afterRef, ][fullCalc] <-
+      baseRef[fullCalc] + (xAfter[fullCalc] - xRef[fullCalc]) * (baseRef[fullCalc] / xRef[fullCalc])**lambda[fullCalc]
+
+    # Now there are two edge cases, we need to handle:
+    # - base[,ref_year,] == 0: In this case, we want to harmonize to the baseline zero as the two disagree what
+    #   is happening in this cell, and therefore we want to use the multiplicative behavior which incidentally
+    #   achieves this. We select the multiplicative behavior by setting lambda to 1 above when baseRef <= xRef,
+    #   as when base[,ref_year,] == 0 this is always true.
+    # - x[,ref_year,] == 0 and base[,ref_year,] > 0: The formula already handles this as the last part of the
+    #   formula becomes: lambda is 0 in this case, baseRef / xRef => Inf, Inf**0 => 1, so additive behavior which
+    #   we want.
+    # - x[,ref_year,] == 0 == base[,ref_year,]: In this case, we want to remain open to any changes from the
+    #   baseline in the future, and thus need to select the additive behavior, as there is nothing to apply a
+    #   relative change to in x.
+    #   As x[,ref_year,] == 0 also is additive, we can simply apply this to all xRef == 0 cases.
+    xRefZeroCells <- xRef == 0
     full[, afterRef, ][xRefZeroCells] <- baseRef[xRefZeroCells] + xAfter[xRefZeroCells]
 
-    full[, afterRef, ][is.na(full[, afterRef, ])] <- 0
   } else {
     stop("Please select harmonization method (additive, multiplicative, limited (default))")
   }
@@ -127,13 +125,13 @@ toolHarmonize2Baseline <- function(x,
   if (any(is.infinite(full) | is.nan(full) | is.na(full))) {
     warning("Data containing inconsistencies.")
   }
-  if (!negative && any(full < 0)) {
+  if (!negative && any(full < 0, na.rm = TRUE)) {
     vcat(2, paste0(
       "toolHarmonize2Baseline created unwanted negativities in the range of ",
       range(full[which(full < 0)]),
       ". They will be set to zero."
     ))
-    full[full < 0] <- 0
+    full[which(full < 0)] <- 0
   }
 
   out <- as.magpie(full, spatial = 1)
