@@ -78,6 +78,31 @@ test_that("limited method is continuous in base[ref] where x[ref] == 0", {
   expect_lte(max(abs(out(2^-59) - out(0))), 2^-59)
 })
 
+test_that("NA in x after ref_year propagates as NA with a warning, not an error or zero", {
+  # An NA input used to be silently zeroed by a since-removed is.na() cleanup.
+  # It must now come through as NA (with the existing "inconsistencies" warning),
+  # and must not trip up the `negative` check that guards the zero-clamp below.
+  # base[ref] <= x[ref], so lambda == 1 (multiplicative shortcut) and
+  # y2016's expected value is simply base[ref] * x[y2016] / x[ref].
+  base <- mkSeries(1, 2015, 1, c(1))
+  x    <- mkSeries(1, c(2015, 2016, 2017), 1, c(7, 14, NA))
+
+  expect_warning(
+    out <- toolHarmonize2Baseline(x, base, ref_year = "y2015"),
+    "inconsistencies"
+  )
+  expect_equal(as.numeric(out[, "y2016", ]), 1 * 14 / 7)
+  expect_true(is.na(as.numeric(out[, "y2017", ])))
+
+  # same, but with a genuine negative present elsewhere so `negative` is TRUE
+  baseNeg <- mkSeries(1, 2015, 1, c(-1))
+  expect_warning(
+    outNeg <- toolHarmonize2Baseline(x, baseNeg, ref_year = "y2015"),
+    "inconsistencies"
+  )
+  expect_true(is.na(as.numeric(outNeg[, "y2017", ])))
+})
+
 test_that("additive, multiplicative and hard_cut methods are unaffected", {
   set.seed(3)
   ncell <- 50
