@@ -23,7 +23,8 @@ toolHarmonize2Baseline <- function(x,
 ) {
   if (!is.magpie(x) || !is.magpie(base)) stop("Input is not a MAgPIE object, x has to be a MAgPIE object!")
 
-  # check for negative range of values
+  # check for negative range of values; na.rm so an NA in x/base (which is meant to
+  # propagate through to the output, not be treated as a sign) doesn't turn this NA
   negative <- (any(x < 0, na.rm = TRUE) | any(base < 0, na.rm = TRUE))
 
   # check if years are overlapping and refs is part of both time horizons
@@ -89,27 +90,29 @@ toolHarmonize2Baseline <- function(x,
     xAfter <- x[, afterRef, ]
 
     # The basic formula in the following is
-    #   base + (xa-xr)*(base/xr)^lambda
+    # _ base + (xa-xr)*(base/xr)^lambda _
     #
     # For lambda == 1, we first use the algebraically identical form base*xa/xr,
-    # as it is numerically more stable and does not result in floating point residualy.
-    # We first, fill it in everywhere since it's cheap, then only
+    # as it is numerically more stable and does not result in floating point residuals.
+    # We first fill it in everywhere since it's cheap, then only
     # the cells it doesn't apply to are overwritten below.
     full[, afterRef, ] <- baseRef * xAfter / xRef
 
-    # We then continue to calculate the full formula for all other cells
+    # We then continue to calculate the full formula for all other cells in which
+    # xref != 0 (see below for details)
     fullCalc <- lambda != 1 & xRef != 0
     full[, afterRef, ][fullCalc] <-
       baseRef[fullCalc] + (xAfter[fullCalc] - xRef[fullCalc]) * (baseRef[fullCalc] / xRef[fullCalc])**lambda[fullCalc]
 
-    # Now there are two edge cases, we need to handle:
+    # Now there are three edge cases, we need to handle:
     # - base[,ref_year,] == 0: In this case, we want to harmonize to the baseline zero as the two disagree what
     #   is happening in this cell, and therefore we want to use the multiplicative behavior which incidentally
     #   achieves this. We select the multiplicative behavior by setting lambda to 1 above when baseRef <= xRef,
-    #   as when base[,ref_year,] == 0 this is always true.
-    # - x[,ref_year,] == 0 and base[,ref_year,] > 0: The formula already handles this as the last part of the
-    #   formula becomes: lambda is 0 in this case, baseRef / xRef => Inf, Inf**0 => 1, so additive behavior which
-    #   we want.
+    #   which holds directly when base[,ref_year,] == 0 and xRef >= 0; for xRef < 0, baseRef <= xRef is false,
+    #   but baseRef / xRef is then non-real so lambda is NaN and gets forced to 1 by the is.nan() cleanup instead.
+    # - x[,ref_year,] == 0 and base[,ref_year,] > 0: excluded from fullCalc above and handled by the direct
+    #   assignment below instead, but would give the same result if it went through the formula: lambda is 0 in
+    #   this case, baseRef / xRef => Inf, Inf**0 => 1, so additive behavior which we want.
     # - x[,ref_year,] == 0 == base[,ref_year,]: In this case, we want to remain open to any changes from the
     #   baseline in the future, and thus need to select the additive behavior, as there is nothing to apply a
     #   relative change to in x.
@@ -125,6 +128,8 @@ toolHarmonize2Baseline <- function(x,
   if (any(is.infinite(full) | is.nan(full) | is.na(full))) {
     warning("Data containing inconsistencies.")
   }
+  # na.rm here too, for the same reason: an NA in full must not make this NA and error
+  # in the &&, it should just fall through with the warning above already raised.
   if (!negative && any(full < 0, na.rm = TRUE)) {
     vcat(2, paste0(
       "toolHarmonize2Baseline created unwanted negativities in the range of ",
