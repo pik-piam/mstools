@@ -19,6 +19,8 @@ Useful links:
 
 Authors:
 
+- Benjamin Leon Bodirsky <bodirsky@pik-potsdam.de>
+
 - Kristine Karstens
 
 - Felicitas Beier

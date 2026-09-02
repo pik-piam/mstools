@@ -51,9 +51,13 @@ toolExpectTrue(is.numeric(1), "data is numeric", level = -1)
 #> [✓] data is numeric
 getMadratMessage("status")
 #> $toolExpectLessDiff
+#> $toolExpectLessDiff[[1]]
 #> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
 #> 
+#> 
 #> $toolExpectTrue
+#> $toolExpectTrue[[1]]
 #> [1] "[✓] data is numeric"
+#> 
 #> 
 ```

@@ -59,6 +59,8 @@ toolExpectLessDiff(1:3, 2:4, 10, "data is sufficiently close", level = -1)
 #> [✓] data is sufficiently close (maxdiff = 1, threshold = 10)
 getMadratMessage("status")
 #> $toolExpectLessDiff
+#> $toolExpectLessDiff[[1]]
 #> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
+#> 
 #> 
 ```

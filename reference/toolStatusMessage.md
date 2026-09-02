@@ -51,14 +51,24 @@ toolStatusMessage("warn", "this is not ok", level = -1)
 #> Warning: 
 getMadratMessage("status")
 #> $toolExpectLessDiff
+#> $toolExpectLessDiff[[1]]
 #> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
 #> 
+#> 
 #> $toolExpectTrue
+#> $toolExpectTrue[[1]]
 #> [1] "[✓] data is numeric"
 #> 
+#> 
 #> $toolStatusMessage
-#> [1] "[✓] everything is ok"                           
-#> [2] "[!] this is not optimal but probably acceptable"
-#> [3] "[WARNING] this is not ok"                       
+#> $toolStatusMessage[[1]]
+#> [1] "[✓] everything is ok"
+#> 
+#> $toolStatusMessage[[2]]
+#> [1] "[!] this is not optimal but probably acceptable"
+#> 
+#> $toolStatusMessage[[3]]
+#> [1] "[WARNING] this is not ok"
+#> 
 #> 
 ```

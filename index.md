@@ -1,9 +1,7 @@
 # Tool functions that can be used by several madrat-dependent or magpie4 output functions
 
-R package **mstools**, version **0.15.0**
+R package **mstools**, version **0.16.0**
 
-[![CRAN
-status](https://www.r-pkg.org/badges/version/mstools)](https://cran.r-project.org/package=mstools)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1158582.svg)](https://doi.org/10.5281/zenodo.1158582)
 [![R build
 status](https://github.com/pik-piam/magpie4/workflows/check/badge.svg)](https://github.com/pik-piam/magpie4/actions)
@@ -54,7 +52,7 @@ To cite package **mstools** in publications use:
 Bodirsky B, Karstens K, Beier F, Dietrich J (2026). “mstools: Tool
 functions that can be used by several madrat-dependent or magpie4 output
 functions.” <doi:10.5281/zenodo.1158582>
-<https://doi.org/10.5281/zenodo.1158582>, Version: 0.15.0,
+<https://doi.org/10.5281/zenodo.1158582>, Version: 0.16.0,
 <https://github.com/pik-piam/magpie4>.
 
 A BibTeX entry for LaTeX users is
@@ -65,9 +63,9 @@ A BibTeX entry for LaTeX users is
    magpie4 output functions},
  author = {Benjamin Leon Bodirsky and Kristine Karstens and Felicitas Beier and Jan Philipp Dietrich},
  doi = {10.5281/zenodo.1158582},
- date = {2026-03-31},
+ date = {2026-08-28},
  year = {2026},
  url = {https://github.com/pik-piam/magpie4},
- note = {Version: 0.15.0},
+ note = {Version: 0.16.0},
 }
 ```
