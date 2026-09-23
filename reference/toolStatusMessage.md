@@ -7,7 +7,7 @@ execution but also collected to be finally returned as data report.
 ## Usage
 
 ``` r
-toolStatusMessage(status, message, level = 0)
+toolStatusMessage(status, message)
 ```
 
 ## Arguments
@@ -22,13 +22,18 @@ toolStatusMessage(status, message, level = 0)
 
   message to be triggered.
 
-- level:
+## Details
 
-  as the test result will be linked to a function call, the function
-  needs to know to which call it should be linked. by default
-  (`level = 0`) the parent function call is being used. Increasing the
-  number by one will let the function go up by one in the call stack,
-  `level = -1` will use `toolExpectTrue` itself as function call.
+The function which a message is attached to is selected automatically:
+it is the innermost function call in the call stack whose name follows
+madrat function naming conventions (starting with `download`, `correct`,
+`convert`, `read`, `calc` or `full`, followed by an upper case letter),
+thereby skipping engine functions such as `readSource` or `calcOutput`
+as well as helper functions (e.g. `toolExpectTrue`). This ensures that
+the message ends up in the cache file of this function and of all
+functions depending on it. If no such function is found in the call
+stack, the nearest enclosing named function call is being used, or
+`.GlobalEnv` if there is none.
 
 ## See also
 
@@ -42,32 +47,30 @@ Jan Philipp Dietrich
 ## Examples
 
 ``` r
-toolStatusMessage("ok", "everything is ok", level = -1)
+toolStatusMessage("ok", "everything is ok")
 #> [✓] everything is ok
-toolStatusMessage("note", "this is not optimal but probably acceptable", level = -1)
+toolStatusMessage("note", "this is not optimal but probably acceptable")
 #> [!] this is not optimal but probably acceptable
-toolStatusMessage("warn", "this is not ok", level = -1)
+toolStatusMessage("warn", "this is not ok")
 #> Warning: [WARNING] this is not ok
 #> Warning: 
 getMadratMessage("status")
-#> $toolExpectLessDiff
-#> $toolExpectLessDiff[[1]]
-#> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
-#> 
-#> 
 #> $toolExpectTrue
 #> $toolExpectTrue[[1]]
+#> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
+#> 
+#> $toolExpectTrue[[2]]
 #> [1] "[✓] data is numeric"
 #> 
 #> 
-#> $toolStatusMessage
-#> $toolStatusMessage[[1]]
+#> $withVisible
+#> $withVisible[[1]]
 #> [1] "[✓] everything is ok"
 #> 
-#> $toolStatusMessage[[2]]
+#> $withVisible[[2]]
 #> [1] "[!] this is not optimal but probably acceptable"
 #> 
-#> $toolStatusMessage[[3]]
+#> $withVisible[[3]]
 #> [1] "[WARNING] this is not ok"
 #> 
 #> 

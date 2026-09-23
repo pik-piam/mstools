@@ -26,3 +26,7 @@ Authors:
 - Felicitas Beier
 
 - Jan Philipp Dietrich <dietrich@pik-potsdam.de>
+
+- Pascal Sauer <pascal.sauer@pik-potsdam.de>
+  ([ORCID](https://orcid.org/0000-0002-6856-8239)) (affiliation: Potsdam
+  Institute for Climate Impact Research)

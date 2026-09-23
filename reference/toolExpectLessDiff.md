@@ -7,7 +7,7 @@ between two objects and returns either a message via
 ## Usage
 
 ``` r
-toolExpectLessDiff(x, y, maxdiff, description, level = 0, maxdiff2 = NULL)
+toolExpectLessDiff(x, y, maxdiff, description, maxdiff2 = NULL)
 ```
 
 ## Arguments
@@ -28,14 +28,6 @@ toolExpectLessDiff(x, y, maxdiff, description, level = 0, maxdiff2 = NULL)
 
   a description of the check
 
-- level:
-
-  as the test result will be linked to a function call, the function
-  needs to know to which call it should be linked. by default
-  (`level = 0`) the parent function call is being used. Increasing the
-  number by one will let the function go up by one in the call stack,
-  `level = -1` will use `toolExpectTrue` itself as function call.
-
 - maxdiff2:
 
   optional additional threshold. If set it will serve as a second,
@@ -55,11 +47,11 @@ Jan Philipp Dietrich
 ## Examples
 
 ``` r
-toolExpectLessDiff(1:3, 2:4, 10, "data is sufficiently close", level = -1)
+toolExpectLessDiff(1:3, 2:4, 10, "data is sufficiently close")
 #> [✓] data is sufficiently close (maxdiff = 1, threshold = 10)
 getMadratMessage("status")
-#> $toolExpectLessDiff
-#> $toolExpectLessDiff[[1]]
+#> $toolExpectTrue
+#> $toolExpectTrue[[1]]
 #> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
 #> 
 #> 

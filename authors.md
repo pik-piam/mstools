@@ -10,18 +10,21 @@
 
 - **Jan Philipp Dietrich**. Author.
 
+- **Pascal Sauer**. Author. [](https://orcid.org/0000-0002-6856-8239)  
+  Potsdam Institute for Climate Impact Research
+
 ## Citation
 
 Source:
 [`inst/CITATION`](https://github.com/pik-piam/magpie4/blob/master/inst/CITATION)
 
-Bodirsky B, Karstens K, Beier F, Dietrich J (2026). *mstools: Tool
-functions that can be used by several madrat-dependent or magpie4 output
-functions*. R package version 0.16.1.
+Bodirsky B, Karstens K, Beier F, Dietrich J, Sauer P (2026). *mstools:
+Tool functions that can be used by several madrat-dependent or magpie4
+output functions*. R package version 0.17.0.
 
     @Manual{,
       title = {mstools: Tool functions that can be used by several madrat-dependent or magpie4 output functions},
-      author = {Benjamin Leon Bodirsky and Kristine Karstens and Felicitas Beier and Jan Philipp Dietrich},
+      author = {Benjamin Leon Bodirsky and Kristine Karstens and Felicitas Beier and Jan Philipp Dietrich and Pascal Sauer},
       year = {2026},
-      note = {R package version 0.16.1},
+      note = {R package version 0.17.0},
     }

@@ -7,7 +7,7 @@ successful or that it failed.
 ## Usage
 
 ``` r
-toolExpectTrue(check, description, level = 0, falseStatus = "note")
+toolExpectTrue(check, description, falseStatus = "note")
 ```
 
 ## Arguments
@@ -19,14 +19,6 @@ toolExpectTrue(check, description, level = 0, falseStatus = "note")
 - description:
 
   a description of the check
-
-- level:
-
-  as the test result will be linked to a function call, the function
-  needs to know to which call it should be linked. by default
-  (`level = 0`) the parent function call is being used. Increasing the
-  number by one will let the function go up by one in the call stack,
-  `level = -1` will use `toolExpectTrue` itself as function call.
 
 - falseStatus:
 
@@ -47,16 +39,14 @@ Jan Philipp Dietrich
 ## Examples
 
 ``` r
-toolExpectTrue(is.numeric(1), "data is numeric", level = -1)
+toolExpectTrue(is.numeric(1), "data is numeric")
 #> [✓] data is numeric
 getMadratMessage("status")
-#> $toolExpectLessDiff
-#> $toolExpectLessDiff[[1]]
-#> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
-#> 
-#> 
 #> $toolExpectTrue
 #> $toolExpectTrue[[1]]
+#> [1] "[✓] data is sufficiently close (maxdiff = 1, threshold = 10)"
+#> 
+#> $toolExpectTrue[[2]]
 #> [1] "[✓] data is numeric"
 #> 
 #> 
