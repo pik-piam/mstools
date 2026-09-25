@@ -16,7 +16,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-
       - name: Install package and dependencies
         shell: Rscript {0}
         run: |
